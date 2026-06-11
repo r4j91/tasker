@@ -10,9 +10,9 @@ import { CompletedSection } from '../features/tasks/CompletedSection'
 export function InboxPage() {
   const tasks = useTaskStore(s => s.tasks)
   const inbox = tasks
-    .filter(t => !t.completed && !t.projectId)
+    .filter(t => !t.completed && !t.parentId && !t.projectId)
     .sort((a, b) => a.order - b.order)
-  const completed = tasks.filter(t => t.completed && !t.projectId)
+  const completed = tasks.filter(t => t.completed && !t.parentId && !t.projectId)
 
   useRegisterVisible(inbox.map(t => t.id))
 

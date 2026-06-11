@@ -12,11 +12,11 @@ import { CompletedSection } from '../features/tasks/CompletedSection'
 
 export function TodayPage() {
   const tasks = useTaskStore(s => s.tasks)
-  const active = tasks.filter(t => !t.completed && t.dueDate)
+  const active = tasks.filter(t => !t.completed && !t.parentId && t.dueDate)
   const overdue = active.filter(t => isOverdue(t.dueDate!)).sort((a, b) => a.dueDate!.localeCompare(b.dueDate!))
   const today = active.filter(t => isDueToday(t.dueDate!)).sort((a, b) => a.order - b.order)
   const completedToday = tasks.filter(
-    t => t.completed && t.completedAt?.slice(0, 10) === todayISO(),
+    t => t.completed && !t.parentId && t.completedAt?.slice(0, 10) === todayISO(),
   )
 
   useRegisterVisible([...overdue, ...today].map(t => t.id))

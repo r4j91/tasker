@@ -13,6 +13,8 @@ export interface Task {
   projectId: string | null
   /** Seção dentro do projeto (opcional) */
   sectionId: string | null
+  /** Tarefa-mãe — presente quando esta é uma sub-tarefa (1 nível) */
+  parentId: string | null
   labels: string[]
   priority: Priority
   order: number

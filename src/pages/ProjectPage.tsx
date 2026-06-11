@@ -32,9 +32,9 @@ export function ProjectPage() {
   const hasSections = projectSections.length > 0
 
   const projectTasks = tasks
-    .filter(t => !t.completed && t.projectId === project?.id)
+    .filter(t => !t.completed && !t.parentId && t.projectId === project?.id)
     .sort((a, b) => a.order - b.order)
-  const completedTasks = tasks.filter(t => t.completed && t.projectId === project?.id)
+  const completedTasks = tasks.filter(t => t.completed && !t.parentId && t.projectId === project?.id)
 
   /* Ordem visível: grupo sem seção primeiro, depois cada seção */
   const visibleOrdered = [

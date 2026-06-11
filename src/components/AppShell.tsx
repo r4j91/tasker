@@ -84,9 +84,9 @@ export function AppShell() {
   }, [navigate])
 
   const todayCount = tasks.filter(
-    t => !t.completed && t.dueDate && (isDueToday(t.dueDate) || isOverdue(t.dueDate)),
+    t => !t.completed && !t.parentId && t.dueDate && (isDueToday(t.dueDate) || isOverdue(t.dueDate)),
   ).length
-  const inboxCount = tasks.filter(t => !t.completed && !t.projectId).length
+  const inboxCount = tasks.filter(t => !t.completed && !t.parentId && !t.projectId).length
 
   const createProject = () => {
     if (!projectName.trim()) return

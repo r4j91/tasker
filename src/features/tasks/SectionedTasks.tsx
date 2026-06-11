@@ -12,6 +12,7 @@ import { ChevronDown, MoreHorizontal, Plus, Pencil, ArrowUp, ArrowDown, Trash2, 
 import type { Task, Section } from './types'
 import { TaskItem } from './TaskItem'
 import { useTaskStore } from '../../stores/useTaskStore'
+import { useUiStore } from '../../stores/useUiStore'
 import { parseTask } from '../../lib/nlparse'
 import { cn } from '../../lib/cn'
 
@@ -37,7 +38,7 @@ export function SectionedTasks({ projectId }: SectionedTasksProps) {
 
   const tasksOf = (sectionId: string | null) =>
     tasks
-      .filter(t => !t.completed && t.projectId === projectId && (t.sectionId ?? null) === sectionId)
+      .filter(t => !t.completed && !t.parentId && t.projectId === projectId && (t.sectionId ?? null) === sectionId)
       .sort((a, b) => a.order - b.order)
 
   const sensors = useSensors(
@@ -153,9 +154,12 @@ function TaskContainer({ sectionId, tasks }: { sectionId: string | null; tasks: 
 }
 
 function SortableTaskRow({ task }: { task: Task }) {
+  /* Expandida: desativa o drag da linha para não conflitar com o reorder das sub-tarefas */
+  const expanded = useUiStore(s => s.expandedId === task.id)
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
     data: { type: 'task' },
+    disabled: expanded,
   })
 
   return (

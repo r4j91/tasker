@@ -103,7 +103,7 @@ function PaletteContent({ onClose }: { onClose: () => void }) {
 
     const taskItems: PaletteItem[] = q
       ? tasks
-          .filter(t => !t.completed && t.title.toLowerCase().includes(q))
+          .filter(t => !t.completed && !t.parentId && t.title.toLowerCase().includes(q))
           .slice(0, 6)
           .map(t => ({
             id: `task-${t.id}`,

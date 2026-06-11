@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
-import { Calendar, Trash2, FolderOpen, Check, CalendarClock, Rows3 } from 'lucide-react'
+import { Calendar, Trash2, FolderOpen, Check, CalendarClock, Rows3, GitFork } from 'lucide-react'
 import { format, addDays } from 'date-fns'
 import type { Task, Priority } from './types'
 import { useTaskStore } from '../../stores/useTaskStore'
@@ -8,6 +8,7 @@ import { useUiStore } from '../../stores/useUiStore'
 import { Checkbox } from '../../components/ui/Checkbox'
 import { Button } from '../../components/ui/Button'
 import { Modal } from '../../components/ui/Modal'
+import { SubtaskList } from './SubtaskList'
 import { dueLabel, isOverdue, isDueToday, todayISO } from '../../lib/dates'
 import { playCompleteSound } from '../../lib/sound'
 import { cn } from '../../lib/cn'
@@ -32,10 +33,14 @@ interface TaskItemProps {
 
 export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps) {
   const toggleComplete = useTaskStore(s => s.toggleComplete)
+  const completeMany = useTaskStore(s => s.completeMany)
   const updateTask = useTaskStore(s => s.updateTask)
   const deleteTask = useTaskStore(s => s.deleteTask)
   const projects = useTaskStore(s => s.projects)
   const sections = useTaskStore(s => s.sections)
+  /* Contagens primitivas — evita re-render por identidade de array */
+  const subtaskTotal = useTaskStore(s => s.tasks.reduce((n, t) => (t.parentId === task.id ? n + 1 : n), 0))
+  const subtaskDone = useTaskStore(s => s.tasks.reduce((n, t) => (t.parentId === task.id && t.completed ? n + 1 : n), 0))
 
   const expanded = useUiStore(s => s.expandedId === task.id)
   const selected = useUiStore(s => s.selectedId === task.id)
@@ -62,6 +67,9 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
       /* Outra tarefa pode ter sido expandida por este mesmo clique */
       if (useUiStore.getState().expandedId !== task.id) return
       const target = e.target as Node
+      /* O clique pode ter removido o alvo do DOM (ex.: botão que vira input) —
+         nesse caso não dá para saber se foi fora; não recolher */
+      if (!target.isConnected) return
       if (rootRef.current?.contains(target)) return
       /* Cliques em modais/popovers (portais no body) não recolhem */
       if ((target as HTMLElement).closest?.('[role="dialog"]')) return
@@ -107,9 +115,29 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
     ? isOverdue(due) ? 'text-overdue' : isDueToday(due) ? 'text-today' : 'text-ink-muted'
     : ''
 
+  const [confirmSubtasks, setConfirmSubtasks] = useState(false)
+
   const complete = () => {
+    /* Concluir a mãe com sub-tarefas pendentes pergunta antes */
+    if (!task.completed && subtaskTotal - subtaskDone > 0) {
+      setConfirmSubtasks(true)
+      return
+    }
     if (!task.completed && soundEnabled) playCompleteSound()
     toggleComplete(task.id)
+  }
+
+  const completeWithSubtasks = (includeSubtasks: boolean) => {
+    if (soundEnabled) playCompleteSound()
+    if (includeSubtasks) {
+      const pending = useTaskStore.getState().tasks
+        .filter(t => t.parentId === task.id && !t.completed)
+        .map(t => t.id)
+      completeMany([task.id, ...pending])
+    } else {
+      toggleComplete(task.id)
+    }
+    setConfirmSubtasks(false)
   }
 
   const onDragEnd = (_: unknown, info: { offset: { x: number } }) => {
@@ -209,8 +237,14 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
           )}
 
           {/* Metadados — abaixo do título, estilo Todoist */}
-          {(due || (project && !hideProject)) && (
+          {(due || subtaskTotal > 0 || (project && !hideProject)) && (
             <span className="flex w-full items-center gap-2 text-[13px] md:text-xs">
+              {subtaskTotal > 0 && (
+                <span className="flex items-center gap-1 text-ink-faint">
+                  <GitFork size={11} className="rotate-180" />
+                  {subtaskDone}/{subtaskTotal}
+                </span>
+              )}
               {due && (
                 <span className={cn('flex items-center gap-1', dueTone)}>
                   <Calendar size={12} />
@@ -246,6 +280,9 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
                 rows={2}
                 className="w-full resize-none rounded-lg border border-line bg-canvas px-3 py-2 text-sm placeholder:text-ink-faint focus:border-primary focus:outline-none"
               />
+
+              {/* Sub-tarefas */}
+              <SubtaskList parentId={task.id} />
 
               <div className="flex flex-wrap items-center gap-2">
                 <label className="flex h-11 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 text-[13px] text-ink-muted transition-colors hover:border-line-strong md:h-8 md:px-2.5 md:text-xs">
@@ -332,6 +369,25 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Concluir a mãe com sub-tarefas pendentes */}
+      <Modal
+        open={confirmSubtasks}
+        onClose={() => setConfirmSubtasks(false)}
+        title="Concluir tarefa"
+      >
+        <p className="mb-4 text-sm text-ink-muted">
+          <strong className="text-ink">{task.title}</strong> tem{' '}
+          {subtaskTotal - subtaskDone}{' '}
+          {subtaskTotal - subtaskDone === 1 ? 'sub-tarefa pendente' : 'sub-tarefas pendentes'}.
+          Concluir junto?
+        </p>
+        <div className="flex flex-wrap justify-end gap-2">
+          <Button variant="ghost" onClick={() => setConfirmSubtasks(false)}>Cancelar</Button>
+          <Button variant="secondary" onClick={() => completeWithSubtasks(false)}>Só esta tarefa</Button>
+          <Button onClick={() => completeWithSubtasks(true)}>Concluir tudo</Button>
+        </div>
+      </Modal>
 
       {/* Sheet de agendamento (swipe para a esquerda) */}
       <Modal open={scheduleOpen} onClose={() => setScheduleOpen(false)} title="Agendar para">

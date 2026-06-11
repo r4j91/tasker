@@ -9,9 +9,11 @@ interface CheckboxProps {
   disabled?: boolean
   /** Cor do círculo (ex.: prioridade da tarefa, estilo Todoist) */
   tint?: string
+  /** Versão compacta (sub-tarefas) */
+  small?: boolean
 }
 
-export function Checkbox({ checked, onChange, label, className, disabled, tint }: CheckboxProps) {
+export function Checkbox({ checked, onChange, label, className, disabled, tint, small }: CheckboxProps) {
   const border = checked || tint ? (tint ?? 'var(--primary)') : 'var(--line-strong)'
   const fill = checked
     ? (tint ?? 'var(--primary)')
@@ -35,7 +37,10 @@ export function Checkbox({ checked, onChange, label, className, disabled, tint }
       {/* Círculo */}
       <motion.span
         aria-hidden
-        className="relative shrink-0 size-[18px] rounded-full border-2 transition-colors duration-150"
+        className={cn(
+          'relative shrink-0 rounded-full border-2 transition-colors duration-150',
+          small ? 'size-[15px]' : 'size-[18px]',
+        )}
         style={{ borderColor: border, backgroundColor: fill }}
         initial={false}
         whileTap={{ scale: 0.85 }}

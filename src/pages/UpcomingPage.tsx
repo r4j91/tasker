@@ -20,7 +20,7 @@ interface Group {
 export function UpcomingPage() {
   const tasks = useTaskStore(s => s.tasks)
   const upcoming = tasks
-    .filter(t => !t.completed && t.dueDate && !isOverdue(t.dueDate))
+    .filter(t => !t.completed && !t.parentId && t.dueDate && !isOverdue(t.dueDate))
     .sort((a, b) => a.dueDate!.localeCompare(b.dueDate!))
 
   /* Próximos 7 dias: um grupo por dia. Depois: um grupo por mês. */

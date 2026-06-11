@@ -22,7 +22,7 @@ interface TaskStore {
   /** Tarefa recém-excluída aguardando undo (não persiste) */
   pendingDelete: PendingDelete | null
 
-  addTask: (input: { title: string; dueDate?: string | null; dueTime?: string | null; projectId?: string | null; sectionId?: string | null; priority?: Priority }) => void
+  addTask: (input: { title: string; dueDate?: string | null; dueTime?: string | null; projectId?: string | null; sectionId?: string | null; parentId?: string | null; priority?: Priority }) => void
   updateTask: (id: string, patch: Partial<Omit<Task, 'id'>>) => void
   toggleComplete: (id: string) => void
   completeMany: (ids: string[]) => void
@@ -50,9 +50,14 @@ export const useTaskStore = create<TaskStore>()(
       sections: [],
       pendingDelete: null,
 
-      addTask: ({ title, dueDate = null, dueTime = null, projectId = null, sectionId = null, priority = 4 }) => {
+      addTask: ({ title, dueDate = null, dueTime = null, projectId = null, sectionId = null, parentId = null, priority = 4 }) => {
         const trimmed = title.trim()
         if (!trimmed) return
+        const { tasks } = get()
+        /* Sub-tarefas entram no fim da lista de irmãs; tarefas normais no topo */
+        const order = parentId
+          ? Math.max(-1, ...tasks.filter(t => t.parentId === parentId).map(t => t.order)) + 1
+          : Math.min(0, ...tasks.map(t => t.order)) - 1
         const task: Task = {
           id: crypto.randomUUID(),
           title: trimmed,
@@ -63,9 +68,10 @@ export const useTaskStore = create<TaskStore>()(
           dueTime,
           projectId,
           sectionId,
+          parentId,
           labels: [],
           priority,
-          order: Math.min(0, ...get().tasks.map(t => t.order)) - 1,
+          order,
           createdAt: new Date().toISOString(),
         }
         set(s => ({ tasks: [task, ...s.tasks] }))
@@ -104,8 +110,13 @@ export const useTaskStore = create<TaskStore>()(
 
       deleteMany: (ids) => {
         const { tasks, pendingDelete } = get()
-        const removed = tasks.filter(t => ids.includes(t.id))
+        /* Excluir uma tarefa-mãe leva as sub-tarefas junto (undo restaura tudo) */
+        const removed = tasks.filter(
+          t => ids.includes(t.id) || (t.parentId !== null && ids.includes(t.parentId)),
+        )
         if (removed.length === 0) return
+        const removedIds = removed.map(t => t.id)
+        ids = removedIds
         /* Se já havia uma exclusão pendente, confirma ela imediatamente */
         if (pendingDelete) clearTimeout(pendingDelete.timeoutId)
         const timeoutId = setTimeout(() => {
