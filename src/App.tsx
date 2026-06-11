@@ -6,6 +6,8 @@ import { TodayPage } from './pages/TodayPage'
 import { UpcomingPage } from './pages/UpcomingPage'
 import { ProjectPage } from './pages/ProjectPage'
 import { ProjectsPage } from './pages/ProjectsPage'
+import { BrowsePage } from './pages/BrowsePage'
+import { FiltersPage, PriorityFilterPage } from './pages/FiltersPage'
 import { DesignSystem } from './pages/DesignSystem'
 import { useUiStore } from './stores/useUiStore'
 
@@ -25,6 +27,9 @@ export default function App() {
           <Route path="/hoje" element={<TodayPage />} />
           <Route path="/em-breve" element={<UpcomingPage />} />
           <Route path="/projetos" element={<ProjectsPage />} />
+          <Route path="/navegar" element={<BrowsePage />} />
+          <Route path="/filtros" element={<FiltersPage />} />
+          <Route path="/filtros/p/:p" element={<PriorityFilterPage />} />
           <Route path="/projeto/:id" element={<ProjectPage />} />
           <Route path="*" element={<InboxPage />} />
         </Route>

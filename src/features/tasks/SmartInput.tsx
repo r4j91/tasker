@@ -1,4 +1,4 @@
-import { forwardRef, useMemo, type InputHTMLAttributes } from 'react'
+import { forwardRef, useEffect, useMemo, type InputHTMLAttributes } from 'react'
 import { Calendar, Clock, Flag, FolderOpen } from 'lucide-react'
 import { parseTask, type ParseResult, type SegmentType } from '../../lib/nlparse'
 import { useTaskStore } from '../../stores/useTaskStore'
@@ -9,6 +9,8 @@ interface SmartInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'v
   value: string
   onChange: (value: string) => void
   onParse?: (result: ParseResult) => void
+  /** Sem borda/sombra, texto maior — para sheets estilo Todoist */
+  bare?: boolean
 }
 
 const SEGMENT_STYLE: Record<SegmentType, string> = {
@@ -23,14 +25,21 @@ const SEGMENT_STYLE: Record<SegmentType, string> = {
 const TEXT_CLS = 'text-base md:text-sm font-sans tracking-normal whitespace-pre'
 
 export const SmartInput = forwardRef<HTMLInputElement, SmartInputProps>(
-  ({ value, onChange, onParse, className, ...props }, ref) => {
+  ({ value, onChange, onParse, className, bare, ...props }, ref) => {
     const projects = useTaskStore(s => s.projects)
 
-    const parsed = useMemo(() => {
-      const r = parseTask(value, projects)
-      onParse?.(r)
-      return r
-    }, [value, projects]) // eslint-disable-line react-hooks/exhaustive-deps
+    /* bare: campo de título de sheet (Todoist) — sem caixa, texto maior.
+       16px no mobile: a regra global anti-zoom força inputs a 16px e o
+       overlay precisa do mesmo tamanho para alinhar. */
+    const sizeCls = bare ? 'text-[16px] font-medium md:text-lg' : TEXT_CLS
+    const padCls = bare ? 'px-0' : 'px-4'
+
+    const parsed = useMemo(() => parseTask(value, projects), [value, projects])
+
+    /* Notifica fora do render — permite que o pai guarde em estado */
+    useEffect(() => {
+      onParse?.(parsed)
+    }, [parsed]) // eslint-disable-line react-hooks/exhaustive-deps
 
     /* Fatias do texto com os destaques */
     const pieces = useMemo(() => {
@@ -54,8 +63,10 @@ export const SmartInput = forwardRef<HTMLInputElement, SmartInputProps>(
           <div
             aria-hidden
             className={cn(
-              'pointer-events-none absolute inset-0 flex items-center overflow-hidden px-4',
-              TEXT_CLS,
+              'pointer-events-none absolute inset-0 flex items-center overflow-hidden',
+              padCls,
+              bare ? 'font-sans tracking-normal whitespace-pre' : '',
+              sizeCls,
             )}
           >
             {pieces.map((p, i) => (
@@ -70,11 +81,14 @@ export const SmartInput = forwardRef<HTMLInputElement, SmartInputProps>(
             value={value}
             onChange={e => onChange(e.target.value)}
             className={cn(
-              'h-11 w-full rounded-xl border border-primary bg-surface-elevated px-4',
-              TEXT_CLS,
+              'h-11 w-full',
+              bare
+                ? 'border-0 bg-transparent shadow-none focus:outline-none focus-visible:outline-none'
+                : 'rounded-xl border border-primary bg-surface-elevated focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-[var(--shadow-md)]',
+              padCls,
+              bare ? 'font-sans tracking-normal whitespace-pre' : '',
+              sizeCls,
               'text-transparent caret-ink placeholder:text-ink-faint',
-              'focus:outline-none focus:ring-2 focus:ring-primary/20',
-              'shadow-[var(--shadow-md)]',
               className,
             )}
             {...props}

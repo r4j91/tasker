@@ -7,6 +7,14 @@ interface UiStore {
   expandedId: string | null
   paletteOpen: boolean
   shortcutsOpen: boolean
+  /** Sheet de adição rápida (FAB mobile) */
+  quickAddOpen: boolean
+  quickAddContext: { projectId?: string | null; sectionId?: string | null; dueDate?: string | null } | null
+  openQuickAdd: (ctx?: { projectId?: string | null; sectionId?: string | null; dueDate?: string | null }) => void
+  setQuickAddOpen: (open: boolean) => void
+  /** Detalhe da tarefa em bottom sheet (mobile) */
+  detailTaskId: string | null
+  setDetailTask: (id: string | null) => void
   soundEnabled: boolean
   /** Tema escuro (persistido em localStorage) */
   dark: boolean
@@ -41,6 +49,12 @@ export const useUiStore = create<UiStore>()((set, get) => ({
   expandedId: null,
   paletteOpen: false,
   shortcutsOpen: false,
+  quickAddOpen: false,
+  quickAddContext: null,
+  openQuickAdd: (ctx) => set({ quickAddOpen: true, quickAddContext: ctx ?? null }),
+  setQuickAddOpen: (open) => set(open ? { quickAddOpen: true } : { quickAddOpen: false, quickAddContext: null }),
+  detailTaskId: null,
+  setDetailTask: (id) => set({ detailTaskId: id }),
   soundEnabled: localStorage.getItem('sound') === 'on',
   dark: initialDark,
   toggleDark: () => {

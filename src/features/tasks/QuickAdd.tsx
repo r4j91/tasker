@@ -2,8 +2,11 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus } from 'lucide-react'
 import { useTaskStore } from '../../stores/useTaskStore'
+import { useUiStore } from '../../stores/useUiStore'
 import { SmartInput } from './SmartInput'
 import type { ParseResult } from '../../lib/nlparse'
+
+const isMobile = () => window.matchMedia('(max-width: 767px)').matches
 
 interface QuickAddProps {
   /** Projeto pré-selecionado (na tela de projeto) */
@@ -18,6 +21,13 @@ export function QuickAdd({ projectId = null, dueDate = null }: QuickAddProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const parsedRef = useRef<ParseResult | null>(null)
   const addTask = useTaskStore(s => s.addTask)
+  const openQuickAdd = useUiStore(s => s.openQuickAdd)
+
+  /* Mobile: abre o sheet estilo Todoist com o contexto da tela */
+  const openAdd = () => {
+    if (isMobile()) openQuickAdd({ projectId, dueDate })
+    else setOpen(true)
+  }
 
   /* Tecla Q abre o campo (fora de inputs) */
   useEffect(() => {
@@ -80,7 +90,7 @@ export function QuickAdd({ projectId = null, dueDate = null }: QuickAddProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.1 }}
-            onClick={() => setOpen(true)}
+            onClick={openAdd}
             className="group flex h-11 w-full cursor-pointer items-center gap-2.5 rounded-lg px-1 text-sm text-ink-faint transition-colors hover:text-ink-muted"
           >
             <span className="flex size-[18px] items-center justify-center rounded-full text-primary-ink transition-colors group-hover:bg-primary group-hover:text-primary-fg">

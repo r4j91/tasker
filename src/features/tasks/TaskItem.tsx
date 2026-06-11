@@ -221,6 +221,11 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
             if (longPressFired.current) { longPressFired.current = false; return }
             if (selectionMode) { toggleChecked(task.id); return }
             setSelected(task.id)
+            /* Mobile: detalhe em bottom sheet (padrão Todoist) */
+            if (window.matchMedia('(max-width: 767px)').matches) {
+              useUiStore.getState().setDetailTask(task.id)
+              return
+            }
             toggleExpanded(task.id)
           }}
           className="flex min-h-12 min-w-0 flex-1 cursor-pointer flex-col justify-center gap-0.5 py-3 text-left"

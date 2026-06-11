@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { Inbox, CalendarDays, CalendarRange, FolderOpen, Plus, Sun, Moon, Search } from 'lucide-react'
+import { Inbox, CalendarDays, CalendarRange, Plus, Sun, Moon, Search } from 'lucide-react'
 import { useTaskStore } from '../stores/useTaskStore'
 import { useUiStore } from '../stores/useUiStore'
 import { PROJECT_COLORS, type Priority } from '../features/tasks/types'
@@ -13,6 +13,9 @@ import { UndoToast } from './UndoToast'
 import { SelectionBar } from './SelectionBar'
 import { CommandPalette } from './CommandPalette'
 import { ShortcutsModal } from './ShortcutsModal'
+import { MobileNav } from './MobileNav'
+import { QuickAddSheet } from './QuickAddSheet'
+import { TaskDetailSheet } from './TaskDetailSheet'
 import { cn } from '../lib/cn'
 
 
@@ -165,43 +168,12 @@ export function AppShell() {
       </aside>
 
       {/* ── Conteúdo ── */}
-      <main className="pb-24 pt-[env(safe-area-inset-top)] md:pb-10 md:pl-60">
+      <main className="pb-32 pt-[env(safe-area-inset-top)] md:pb-10 md:pl-60">
         <Outlet />
       </main>
 
-      {/* ── Navegação inferior (mobile) ── */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-canvas/90 backdrop-blur-md md:hidden">
-        <div className="grid grid-cols-5 px-1 pb-[env(safe-area-inset-bottom)]">
-          {[
-            { to: '/', icon: Inbox, label: 'Entrada', end: true },
-            { to: '/hoje', icon: CalendarDays, label: 'Hoje' },
-            { to: '/em-breve', icon: CalendarRange, label: 'Em breve' },
-            { to: '/projetos', icon: FolderOpen, label: 'Projetos' },
-          ].map(({ to, icon: Icon, label, end }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={end}
-              className={({ isActive }) =>
-                cn(
-                  'flex min-h-[52px] flex-col items-center justify-center gap-0.5 text-[11px] font-medium transition-colors',
-                  isActive ? 'text-primary-ink' : 'text-ink-faint',
-                )
-              }
-            >
-              <Icon size={21} />
-              {label}
-            </NavLink>
-          ))}
-          <button
-            onClick={() => useUiStore.getState().setPaletteOpen(true)}
-            className="flex min-h-[52px] cursor-pointer flex-col items-center justify-center gap-0.5 text-[11px] font-medium text-ink-faint transition-colors"
-          >
-            <Search size={21} />
-            Buscar
-          </button>
-        </div>
-      </nav>
+      {/* ── Navegação inferior (mobile) — pílula flutuante ── */}
+      <MobileNav />
 
       {/* ── Modal: novo projeto ── */}
       <Modal open={newProjectOpen} onClose={() => setNewProjectOpen(false)} title="Novo projeto">
@@ -246,6 +218,8 @@ export function AppShell() {
       <SelectionBar />
       <CommandPalette />
       <ShortcutsModal />
+      <QuickAddSheet />
+      <TaskDetailSheet />
     </div>
   )
 }

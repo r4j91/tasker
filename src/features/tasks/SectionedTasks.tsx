@@ -322,7 +322,13 @@ function SectionBlock({ section, tasks, canMoveUp, canMoveDown }: {
                 />
               ) : (
                 <button
-                  onClick={() => setAdding(true)}
+                  onClick={() => {
+                    if (window.matchMedia('(max-width: 767px)').matches) {
+                      useUiStore.getState().openQuickAdd({ projectId: section.projectId, sectionId: section.id })
+                    } else {
+                      setAdding(true)
+                    }
+                  }}
                   className="group flex h-11 w-full cursor-pointer items-center gap-2.5 rounded-lg px-1 text-sm text-ink-faint transition-colors hover:text-ink-muted md:h-10 md:text-[13px]"
                 >
                   <span className="flex size-[16px] items-center justify-center rounded-full text-primary-ink transition-colors group-hover:bg-primary group-hover:text-primary-fg">
