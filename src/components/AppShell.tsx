@@ -1,13 +1,17 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { Inbox, CalendarDays, CalendarRange, FolderOpen, Plus, Sun, Moon } from 'lucide-react'
+import { Inbox, CalendarDays, CalendarRange, FolderOpen, Plus, Sun, Moon, Search } from 'lucide-react'
 import { useTaskStore } from '../stores/useTaskStore'
-import { PROJECT_COLORS } from '../features/tasks/types'
+import { useUiStore } from '../stores/useUiStore'
+import { PROJECT_COLORS, type Priority } from '../features/tasks/types'
 import { isDueToday, isOverdue } from '../lib/dates'
+import { playCompleteSound } from '../lib/sound'
 import { Modal } from './ui/Modal'
 import { Input } from './ui/Input'
 import { Button } from './ui/Button'
 import { UndoToast } from './UndoToast'
+import { CommandPalette } from './CommandPalette'
+import { ShortcutsModal } from './ShortcutsModal'
 import { cn } from '../lib/cn'
 
 interface AppShellProps {
@@ -32,6 +36,53 @@ export function AppShell({ dark, onToggleTheme }: AppShellProps) {
   const [newProjectOpen, setNewProjectOpen] = useState(false)
   const [projectName, setProjectName] = useState('')
   const [projectColor, setProjectColor] = useState<string>(PROJECT_COLORS[0])
+
+  /* ── Atalhos globais de teclado ── */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement
+      const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable
+      if (typing || e.metaKey || e.ctrlKey || e.altKey) return
+
+      const ui = useUiStore.getState()
+      if (ui.paletteOpen || ui.shortcutsOpen) return
+
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault(); ui.moveSelection(1); break
+        case 'ArrowUp':
+          e.preventDefault(); ui.moveSelection(-1); break
+        case 'Enter':
+          if (ui.selectedId) { e.preventDefault(); ui.toggleExpanded(ui.selectedId) }
+          break
+        case 'e': case 'E': {
+          if (!ui.selectedId) break
+          e.preventDefault()
+          const store = useTaskStore.getState()
+          const task = store.tasks.find(t => t.id === ui.selectedId)
+          if (task && !task.completed && ui.soundEnabled) playCompleteSound()
+          store.toggleComplete(ui.selectedId)
+          break
+        }
+        case '1': case '2': case '3': case '4':
+          if (ui.selectedId) {
+            e.preventDefault()
+            useTaskStore.getState().updateTask(ui.selectedId, { priority: Number(e.key) as Priority })
+          }
+          break
+        case 't': case 'T':
+          e.preventDefault(); navigate('/hoje'); break
+        case '?':
+          e.preventDefault(); ui.setShortcutsOpen(true); break
+        case 'Escape':
+          if (ui.expandedId) ui.setExpanded(null)
+          else if (ui.selectedId) ui.setSelected(null)
+          break
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [navigate])
 
   const todayCount = tasks.filter(
     t => !t.completed && t.dueDate && (isDueToday(t.dueDate) || isOverdue(t.dueDate)),
@@ -61,6 +112,15 @@ export function AppShell({ dark, onToggleTheme }: AppShellProps) {
             {dark ? <Sun size={14} /> : <Moon size={14} />}
           </button>
         </div>
+
+        <button
+          onClick={() => useUiStore.getState().setPaletteOpen(true)}
+          className="mb-4 flex h-9 w-full cursor-pointer items-center gap-2 rounded-lg border border-line bg-canvas px-3 text-sm text-ink-faint transition-colors hover:border-line-strong"
+        >
+          <Search size={14} />
+          Buscar...
+          <kbd className="ml-auto rounded border border-line bg-surface px-1.5 py-0.5 text-[10px]">⌘K</kbd>
+        </button>
 
         <nav className="flex flex-col gap-0.5">
           <NavLink to="/" end className={navItem}>
@@ -173,6 +233,8 @@ export function AppShell({ dark, onToggleTheme }: AppShellProps) {
       </Modal>
 
       <UndoToast />
+      <CommandPalette onToggleTheme={onToggleTheme} />
+      <ShortcutsModal />
     </div>
   )
 }

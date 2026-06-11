@@ -21,7 +21,7 @@ interface TaskStore {
   /** Tarefa recém-excluída aguardando undo (não persiste) */
   pendingDelete: PendingDelete | null
 
-  addTask: (input: { title: string; dueDate?: string | null; projectId?: string | null; priority?: Priority }) => void
+  addTask: (input: { title: string; dueDate?: string | null; dueTime?: string | null; projectId?: string | null; priority?: Priority }) => void
   updateTask: (id: string, patch: Partial<Omit<Task, 'id'>>) => void
   toggleComplete: (id: string) => void
   deleteTask: (id: string) => void
@@ -40,7 +40,7 @@ export const useTaskStore = create<TaskStore>()(
       projects: [],
       pendingDelete: null,
 
-      addTask: ({ title, dueDate = null, projectId = null, priority = 4 }) => {
+      addTask: ({ title, dueDate = null, dueTime = null, projectId = null, priority = 4 }) => {
         const trimmed = title.trim()
         if (!trimmed) return
         const task: Task = {
@@ -50,6 +50,7 @@ export const useTaskStore = create<TaskStore>()(
           completed: false,
           completedAt: null,
           dueDate,
+          dueTime,
           projectId,
           labels: [],
           priority,

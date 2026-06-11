@@ -1,11 +1,15 @@
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Calendar, Flag, Trash2, FolderOpen } from 'lucide-react'
+import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
+import { Calendar, Flag, Trash2, FolderOpen, Check, CalendarClock } from 'lucide-react'
+import { format, addDays } from 'date-fns'
 import type { Task, Priority } from './types'
 import { useTaskStore } from '../../stores/useTaskStore'
+import { useUiStore } from '../../stores/useUiStore'
 import { Checkbox } from '../../components/ui/Checkbox'
 import { Button } from '../../components/ui/Button'
-import { dueLabel, isOverdue, isDueToday } from '../../lib/dates'
+import { Modal } from '../../components/ui/Modal'
+import { dueLabel, isOverdue, isDueToday, todayISO } from '../../lib/dates'
+import { playCompleteSound } from '../../lib/sound'
 import { cn } from '../../lib/cn'
 
 const PRIORITY_META: Record<Priority, { label: string; cls: string }> = {
@@ -15,18 +19,32 @@ const PRIORITY_META: Record<Priority, { label: string; cls: string }> = {
   4: { label: 'P4', cls: 'text-ink-faint' },
 }
 
+const isTouch = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+
+const SWIPE_THRESHOLD = 90
+
 interface TaskItemProps {
   task: Task
-  /** Oculta o nome do projeto (na tela do próprio projeto) */
   hideProject?: boolean
 }
 
 export function TaskItem({ task, hideProject }: TaskItemProps) {
-  const [expanded, setExpanded] = useState(false)
   const toggleComplete = useTaskStore(s => s.toggleComplete)
   const updateTask = useTaskStore(s => s.updateTask)
   const deleteTask = useTaskStore(s => s.deleteTask)
   const projects = useTaskStore(s => s.projects)
+
+  const expanded = useUiStore(s => s.expandedId === task.id)
+  const selected = useUiStore(s => s.selectedId === task.id)
+  const toggleExpanded = useUiStore(s => s.toggleExpanded)
+  const setSelected = useUiStore(s => s.setSelected)
+  const soundEnabled = useUiStore(s => s.soundEnabled)
+
+  const [scheduleOpen, setScheduleOpen] = useState(false)
+
+  const x = useMotionValue(0)
+  const rightHint = useTransform(x, [0, SWIPE_THRESHOLD], [0, 1])
+  const leftHint = useTransform(x, [-SWIPE_THRESHOLD, 0], [1, 0])
 
   const project = projects.find(p => p.id === task.projectId)
   const due = task.dueDate
@@ -34,30 +52,69 @@ export function TaskItem({ task, hideProject }: TaskItemProps) {
     ? isOverdue(due) ? 'text-overdue' : isDueToday(due) ? 'text-today' : 'text-ink-muted'
     : ''
 
+  const complete = () => {
+    if (!task.completed && soundEnabled) playCompleteSound()
+    toggleComplete(task.id)
+  }
+
+  const onDragEnd = (_: unknown, info: { offset: { x: number } }) => {
+    if (info.offset.x > SWIPE_THRESHOLD) complete()
+    else if (info.offset.x < -SWIPE_THRESHOLD) setScheduleOpen(true)
+  }
+
+  const scheduleOptions: Array<{ label: string; date: string | null }> = [
+    { label: 'Hoje', date: todayISO() },
+    { label: 'Amanhã', date: format(addDays(new Date(), 1), 'yyyy-MM-dd') },
+    { label: 'Próxima semana', date: format(addDays(new Date(), 7), 'yyyy-MM-dd') },
+    { label: 'Remover data', date: null },
+  ]
+
   return (
     <div
       className={cn(
-        'rounded-xl border border-transparent transition-colors',
+        'relative rounded-xl border border-transparent transition-colors',
         expanded && 'border-line bg-surface-elevated shadow-[var(--shadow-md)]',
+        selected && !expanded && 'border-line-strong bg-surface',
       )}
     >
-      {/* Linha principal */}
-      <div className="flex items-center gap-1 pl-2 pr-1">
+      {/* Fundos revelados pelo swipe (apenas touch) */}
+      {isTouch && !expanded && (
+        <>
+          <motion.div
+            style={{ opacity: rightHint }}
+            className="absolute inset-y-0 left-0 flex w-24 items-center justify-start rounded-l-xl bg-done-bg pl-4 text-done"
+          >
+            <Check size={18} />
+          </motion.div>
+          <motion.div
+            style={{ opacity: leftHint }}
+            className="absolute inset-y-0 right-0 flex w-24 items-center justify-end rounded-r-xl bg-today-bg pr-4 text-today"
+          >
+            <CalendarClock size={18} />
+          </motion.div>
+        </>
+      )}
+
+      {/* Linha principal (arrastável no touch) */}
+      <motion.div
+        drag={isTouch && !expanded ? 'x' : false}
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.6}
+        dragDirectionLock
+        style={{ x }}
+        onDragEnd={onDragEnd}
+        className={cn('relative flex items-center gap-1 pl-2 pr-1', isTouch && 'touch-pan-y')}
+      >
         <Checkbox
           checked={task.completed}
-          onChange={() => toggleComplete(task.id)}
+          onChange={complete}
           className="w-auto shrink-0"
         />
         <button
-          onClick={() => setExpanded(e => !e)}
+          onClick={() => { setSelected(task.id); toggleExpanded(task.id) }}
           className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-2 py-2 text-left"
         >
-          <span
-            className={cn(
-              'truncate text-sm',
-              task.completed && 'text-ink-faint line-through',
-            )}
-          >
+          <span className={cn('truncate text-sm', task.completed && 'text-ink-faint line-through')}>
             {task.title}
           </span>
           <span className="ml-auto flex shrink-0 items-center gap-2">
@@ -65,14 +122,16 @@ export function TaskItem({ task, hideProject }: TaskItemProps) {
               <Flag size={12} className={PRIORITY_META[task.priority].cls} fill="currentColor" />
             )}
             {due && (
-              <span className={cn('text-xs', dueTone)}>{dueLabel(due)}</span>
+              <span className={cn('text-xs', dueTone)}>
+                {dueLabel(due)}{task.dueTime && ` · ${task.dueTime}`}
+              </span>
             )}
             {project && !hideProject && (
               <span className="size-2 rounded-full" style={{ background: project.color }} />
             )}
           </span>
         </button>
-      </div>
+      </motion.div>
 
       {/* Edição inline */}
       <AnimatePresence initial={false}>
@@ -94,7 +153,6 @@ export function TaskItem({ task, hideProject }: TaskItemProps) {
               />
 
               <div className="flex flex-wrap items-center gap-2">
-                {/* Data */}
                 <label className="flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-2.5 text-xs text-ink-muted transition-colors hover:border-line-strong">
                   <Calendar size={13} />
                   <input
@@ -105,7 +163,16 @@ export function TaskItem({ task, hideProject }: TaskItemProps) {
                   />
                 </label>
 
-                {/* Projeto */}
+                <label className="flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-2.5 text-xs text-ink-muted transition-colors hover:border-line-strong">
+                  <CalendarClock size={13} />
+                  <input
+                    type="time"
+                    value={task.dueTime ?? ''}
+                    onChange={e => updateTask(task.id, { dueTime: e.target.value || null })}
+                    className="cursor-pointer bg-transparent text-xs text-ink outline-none"
+                  />
+                </label>
+
                 <label className="flex h-8 items-center gap-1.5 rounded-lg border border-line px-2.5 text-xs text-ink-muted transition-colors hover:border-line-strong">
                   <FolderOpen size={13} />
                   <select
@@ -120,7 +187,6 @@ export function TaskItem({ task, hideProject }: TaskItemProps) {
                   </select>
                 </label>
 
-                {/* Prioridade */}
                 <div className="flex h-8 items-center gap-0.5 rounded-lg border border-line px-1">
                   {([1, 2, 3, 4] as Priority[]).map(p => (
                     <button
@@ -139,11 +205,10 @@ export function TaskItem({ task, hideProject }: TaskItemProps) {
                   ))}
                 </div>
 
-                {/* Excluir */}
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => { deleteTask(task.id); setExpanded(false) }}
+                  onClick={() => deleteTask(task.id)}
                   className="ml-auto text-overdue hover:text-overdue hover:bg-overdue-bg"
                 >
                   <Trash2 size={14} />
@@ -154,6 +219,21 @@ export function TaskItem({ task, hideProject }: TaskItemProps) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Sheet de agendamento (swipe para a esquerda) */}
+      <Modal open={scheduleOpen} onClose={() => setScheduleOpen(false)} title="Agendar para">
+        <div className="flex flex-col gap-1">
+          {scheduleOptions.map(opt => (
+            <button
+              key={opt.label}
+              onClick={() => { updateTask(task.id, { dueDate: opt.date }); setScheduleOpen(false) }}
+              className="flex min-h-11 cursor-pointer items-center rounded-lg px-3 text-left text-sm transition-colors hover:bg-surface"
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </Modal>
     </div>
   )
 }

@@ -8,6 +8,8 @@ export interface Task {
   completedAt: string | null
   /** Data de vencimento em ISO (yyyy-MM-dd), sem hora */
   dueDate: string | null
+  /** Hora opcional (HH:mm) */
+  dueTime: string | null
   projectId: string | null
   labels: string[]
   priority: Priority

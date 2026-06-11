@@ -8,6 +8,7 @@ import { EmptyState } from '../components/EmptyState'
 import { Button } from '../components/ui/Button'
 import { Modal } from '../components/ui/Modal'
 import { cn } from '../lib/cn'
+import { useRegisterVisible } from '../lib/useRegisterVisible'
 
 export function ProjectPage() {
   const { id } = useParams<{ id: string }>()
@@ -24,6 +25,13 @@ export function ProjectPage() {
 
   const project = projects.find(p => p.id === id)
 
+  const projectTasks = tasks
+    .filter(t => !t.completed && t.projectId === project?.id)
+    .sort((a, b) => a.order - b.order)
+  const doneCount = tasks.filter(t => t.completed && t.projectId === project?.id).length
+
+  useRegisterVisible(projectTasks.map(t => t.id))
+
   if (!project) {
     return (
       <div className="page-wrap pt-10">
@@ -35,11 +43,6 @@ export function ProjectPage() {
       </div>
     )
   }
-
-  const projectTasks = tasks
-    .filter(t => !t.completed && t.projectId === project.id)
-    .sort((a, b) => a.order - b.order)
-  const doneCount = tasks.filter(t => t.completed && t.projectId === project.id).length
 
   const saveName = () => {
     if (name.trim()) updateProject(project.id, { name: name.trim() })

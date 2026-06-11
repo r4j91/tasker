@@ -9,6 +9,7 @@ import {
   parseDue, isOverdue, isWithinNext7Days, upcomingGroupLabel, monthLabel,
 } from '../lib/dates'
 import type { Task } from '../features/tasks/types'
+import { useRegisterVisible } from '../lib/useRegisterVisible'
 
 interface Group {
   key: string
@@ -34,6 +35,8 @@ export function UpcomingPage() {
     if (existing) existing.tasks.push(task)
     else groups.push({ key, label, tasks: [task] })
   }
+
+  useRegisterVisible(upcoming.map(t => t.id))
 
   return (
     <div className="page-wrap pt-8 md:pt-10">

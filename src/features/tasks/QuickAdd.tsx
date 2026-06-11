@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus } from 'lucide-react'
 import { useTaskStore } from '../../stores/useTaskStore'
-import { cn } from '../../lib/cn'
+import { SmartInput } from './SmartInput'
+import type { ParseResult } from '../../lib/nlparse'
 
 interface QuickAddProps {
   /** Projeto pré-selecionado (na tela de projeto) */
@@ -15,6 +16,7 @@ export function QuickAdd({ projectId = null, dueDate = null }: QuickAddProps) {
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+  const parsedRef = useRef<ParseResult | null>(null)
   const addTask = useTaskStore(s => s.addTask)
 
   /* Tecla Q abre o campo (fora de inputs) */
@@ -22,7 +24,7 @@ export function QuickAdd({ projectId = null, dueDate = null }: QuickAddProps) {
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement
       const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable
-      if (typing) return
+      if (typing || e.metaKey || e.ctrlKey || e.altKey) return
       if (e.key === 'q' || e.key === 'Q') {
         e.preventDefault()
         setOpen(true)
@@ -32,13 +34,16 @@ export function QuickAdd({ projectId = null, dueDate = null }: QuickAddProps) {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
-  useEffect(() => {
-    if (open) inputRef.current?.focus()
-  }, [open])
-
   const submit = () => {
-    if (!title.trim()) return
-    addTask({ title, projectId, dueDate })
+    const parsed = parsedRef.current
+    if (!parsed || !parsed.title.trim()) return
+    addTask({
+      title: parsed.title,
+      dueDate: parsed.dueDate ?? dueDate,
+      dueTime: parsed.dueTime,
+      projectId: parsed.projectId ?? projectId,
+      priority: parsed.priority,
+    })
     setTitle('')
     inputRef.current?.focus()
   }
@@ -54,22 +59,18 @@ export function QuickAdd({ projectId = null, dueDate = null }: QuickAddProps) {
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.15, ease: 'easeOut' }}
           >
-            <input
+            <SmartInput
               ref={inputRef}
               autoFocus
               value={title}
-              onChange={e => setTitle(e.target.value)}
+              onChange={setTitle}
+              onParse={r => { parsedRef.current = r }}
               onKeyDown={e => {
                 if (e.key === 'Enter') submit()
                 if (e.key === 'Escape') { setTitle(''); setOpen(false) }
               }}
               onBlur={() => { if (!title.trim()) setOpen(false) }}
-              placeholder="O que precisa ser feito? (Enter para adicionar)"
-              className={cn(
-                'h-11 w-full rounded-xl border border-primary bg-surface-elevated px-4 text-sm',
-                'placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-primary/20',
-                'shadow-[var(--shadow-md)]',
-              )}
+              placeholder='Tente: "pagar internet amanhã 9h #casa p2"'
             />
           </motion.div>
         ) : (
@@ -80,10 +81,7 @@ export function QuickAdd({ projectId = null, dueDate = null }: QuickAddProps) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.1 }}
             onClick={() => setOpen(true)}
-            className={cn(
-              'flex h-11 w-full cursor-pointer items-center gap-2.5 rounded-xl border border-dashed border-line px-4',
-              'text-sm text-ink-faint transition-colors hover:border-line-strong hover:text-ink-muted',
-            )}
+            className="flex h-11 w-full cursor-pointer items-center gap-2.5 rounded-xl border border-dashed border-line px-4 text-sm text-ink-faint transition-colors hover:border-line-strong hover:text-ink-muted"
           >
             <Plus size={16} />
             Adicionar tarefa

@@ -4,12 +4,15 @@ import { TaskList } from '../features/tasks/TaskList'
 import { QuickAdd } from '../features/tasks/QuickAdd'
 import { PageHeader } from '../components/PageHeader'
 import { EmptyState } from '../components/EmptyState'
+import { useRegisterVisible } from '../lib/useRegisterVisible'
 
 export function InboxPage() {
   const tasks = useTaskStore(s => s.tasks)
   const inbox = tasks
     .filter(t => !t.completed && !t.projectId)
     .sort((a, b) => a.order - b.order)
+
+  useRegisterVisible(inbox.map(t => t.id))
 
   return (
     <div className="page-wrap pt-8 md:pt-10">
