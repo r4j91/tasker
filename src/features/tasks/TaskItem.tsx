@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
-import { Calendar, Flag, Trash2, FolderOpen, Check, CalendarClock, Rows3 } from 'lucide-react'
+import { Calendar, Trash2, FolderOpen, Check, CalendarClock, Rows3 } from 'lucide-react'
 import { format, addDays } from 'date-fns'
 import type { Task, Priority } from './types'
 import { useTaskStore } from '../../stores/useTaskStore'
@@ -12,10 +12,10 @@ import { dueLabel, isOverdue, isDueToday, todayISO } from '../../lib/dates'
 import { playCompleteSound } from '../../lib/sound'
 import { cn } from '../../lib/cn'
 
-const PRIORITY_META: Record<Priority, { label: string; cls: string }> = {
-  1: { label: 'P1', cls: 'text-overdue' },
-  2: { label: 'P2', cls: 'text-today' },
-  3: { label: 'P3', cls: 'text-primary-ink' },
+const PRIORITY_META: Record<Priority, { label: string; cls: string; tint?: string }> = {
+  1: { label: 'P1', cls: 'text-overdue',     tint: 'var(--overdue)' },
+  2: { label: 'P2', cls: 'text-today',       tint: 'var(--today)' },
+  3: { label: 'P3', cls: 'text-primary-ink', tint: 'var(--primary-ink)' },
   4: { label: 'P4', cls: 'text-ink-faint' },
 }
 
@@ -53,19 +53,23 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
   const longPressFired = useRef(false)
   const rootRef = useRef<HTMLDivElement>(null)
 
-  /* Clicar fora da tarefa expandida recolhe a edição */
+  /* Clicar fora da tarefa expandida recolhe a edição.
+     Usa o evento click (após o mouseup) — recolher no pointerdown faria o
+     conteúdo deslizar sob o cursor e o mouseup acertar botões errados. */
   useEffect(() => {
     if (!expanded) return
-    const onPointerDown = (e: PointerEvent) => {
+    const onClick = (e: MouseEvent) => {
+      /* Outra tarefa pode ter sido expandida por este mesmo clique */
+      if (useUiStore.getState().expandedId !== task.id) return
       const target = e.target as Node
       if (rootRef.current?.contains(target)) return
       /* Cliques em modais/popovers (portais no body) não recolhem */
       if ((target as HTMLElement).closest?.('[role="dialog"]')) return
       useUiStore.getState().setExpanded(null)
     }
-    document.addEventListener('pointerdown', onPointerDown)
-    return () => document.removeEventListener('pointerdown', onPointerDown)
-  }, [expanded])
+    document.addEventListener('click', onClick)
+    return () => document.removeEventListener('click', onClick)
+  }, [expanded, task.id])
 
   /* Toque longo (450ms) entra em modo seleção — apenas touch, tarefas ativas */
   const startLongPress = (e: React.PointerEvent) => {
@@ -174,6 +178,7 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
           <Checkbox
             checked={task.completed}
             onChange={complete}
+            tint={PRIORITY_META[task.priority].tint}
             className="w-auto shrink-0"
           />
         )}
@@ -187,13 +192,18 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
           }}
           className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-2 py-2 text-left"
         >
-          <span className={cn('truncate text-sm', task.completed && 'text-ink-faint line-through')}>
-            {task.title}
+          <span className="flex min-w-0 flex-col">
+            <span className={cn('truncate text-sm', task.completed && 'text-ink-faint line-through')}>
+              {task.title}
+            </span>
+            {/* Prévia da descrição (primeira linha) */}
+            {task.notes.trim() && !expanded && (
+              <span className="truncate text-xs text-ink-muted">
+                {task.notes.trim().split('\n')[0]}
+              </span>
+            )}
           </span>
           <span className="ml-auto flex shrink-0 items-center gap-2">
-            {task.priority < 4 && (
-              <Flag size={12} className={PRIORITY_META[task.priority].cls} fill="currentColor" />
-            )}
             {due && (
               <span className={cn('text-xs', dueTone)}>
                 {dueLabel(due)}{task.dueTime && ` · ${task.dueTime}`}

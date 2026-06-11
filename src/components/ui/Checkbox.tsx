@@ -7,9 +7,17 @@ interface CheckboxProps {
   label?: string
   className?: string
   disabled?: boolean
+  /** Cor do círculo (ex.: prioridade da tarefa, estilo Todoist) */
+  tint?: string
 }
 
-export function Checkbox({ checked, onChange, label, className, disabled }: CheckboxProps) {
+export function Checkbox({ checked, onChange, label, className, disabled, tint }: CheckboxProps) {
+  const border = checked || tint ? (tint ?? 'var(--primary)') : 'var(--line-strong)'
+  const fill = checked
+    ? (tint ?? 'var(--primary)')
+    : tint
+      ? `color-mix(in oklab, ${tint} 14%, transparent)`
+      : 'transparent'
   return (
     <button
       type="button"
@@ -27,12 +35,9 @@ export function Checkbox({ checked, onChange, label, className, disabled }: Chec
       {/* Círculo */}
       <motion.span
         aria-hidden
-        className="relative shrink-0 size-[18px] rounded-full border-2"
+        className="relative shrink-0 size-[18px] rounded-full border-2 transition-colors duration-150"
+        style={{ borderColor: border, backgroundColor: fill }}
         initial={false}
-        animate={{
-          borderColor: checked ? 'var(--primary)' : 'var(--line-strong)',
-          backgroundColor: checked ? 'var(--primary)' : 'rgba(0,0,0,0)',
-        }}
         whileTap={{ scale: 0.85 }}
         transition={{ duration: 0.16, ease: 'easeOut' }}
       >
@@ -49,7 +54,7 @@ export function Checkbox({ checked, onChange, label, className, disabled }: Chec
             >
               <motion.path
                 d="M1 5.5L4 8.5L11 1.5"
-                stroke="var(--primary-fg)"
+                stroke={tint ? 'white' : 'var(--primary-fg)'}
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
