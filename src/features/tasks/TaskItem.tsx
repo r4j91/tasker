@@ -171,6 +171,9 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
                 'flex size-[18px] items-center justify-center rounded-full border-2 transition-colors',
                 isChecked ? 'border-primary bg-primary text-primary-fg' : 'border-line-strong',
               )}
+              style={!isChecked && PRIORITY_META[task.priority].tint
+                ? { borderColor: PRIORITY_META[task.priority].tint }
+                : undefined}
             >
               {isChecked && <Check size={11} strokeWidth={3} />}
             </span>

@@ -99,8 +99,11 @@ export const SmartInput = forwardRef<HTMLInputElement, SmartInputProps>(
               </span>
             )}
             {parsed.priority < 4 && (
-              <span className="flex items-center gap-1 text-overdue">
-                <Flag size={12} /> P{parsed.priority}
+              <span
+                className="flex items-center gap-1"
+                style={{ color: `var(--priority-${parsed.priority})` }}
+              >
+                <Flag size={12} fill="currentColor" /> P{parsed.priority}
               </span>
             )}
           </div>
