@@ -38,6 +38,11 @@
   --done:              oklch(0.570 0.080 155);
   --done-bg:           oklch(0.935 0.032 152);
 
+  /* Prioridades — separação clara estilo Todoist */
+  --priority-1:        oklch(0.560 0.180 25);
+  --priority-2:        oklch(0.680 0.150 60);
+  --priority-3:        oklch(0.500 0.140 262);
+
   /* Sombras */
   --shadow-sm: 0 1px 2px oklch(0.2 0.02 262 / 0.06);
   --shadow-md: 0 2px 8px oklch(0.2 0.02 262 / 0.08), 0 1px 2px oklch(0.2 0.02 262 / 0.05);
@@ -77,6 +82,11 @@
   --today-bg:          oklch(0.350 0.026 70);
   --done:              oklch(0.800 0.065 155);
   --done-bg:           oklch(0.340 0.024 152);
+
+  /* Prioridades */
+  --priority-1:        oklch(0.700 0.165 25);
+  --priority-2:        oklch(0.780 0.135 65);
+  --priority-3:        oklch(0.700 0.110 262);
 
   /* Sombras */
   --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.20);

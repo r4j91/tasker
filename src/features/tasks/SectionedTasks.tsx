@@ -12,6 +12,7 @@ import { ChevronDown, MoreHorizontal, Plus, Pencil, ArrowUp, ArrowDown, Trash2, 
 import type { Task, Section } from './types'
 import { TaskItem } from './TaskItem'
 import { useTaskStore } from '../../stores/useTaskStore'
+import { parseTask } from '../../lib/nlparse'
 import { cn } from '../../lib/cn'
 
 const NO_SECTION = 'none'
@@ -199,9 +200,19 @@ function SectionBlock({ section, tasks, canMoveUp, canMoveDown }: {
     setRenaming(false)
   }
 
+  const projects = useTaskStore(s => s.projects)
+
   const submitTask = () => {
-    if (!newTitle.trim()) return
-    addTask({ title: newTitle, projectId: section.projectId, sectionId: section.id })
+    const parsed = parseTask(newTitle, projects)
+    if (!parsed.title.trim()) return
+    addTask({
+      title: parsed.title,
+      dueDate: parsed.dueDate,
+      dueTime: parsed.dueTime,
+      priority: parsed.priority,
+      projectId: section.projectId,
+      sectionId: section.id,
+    })
     setNewTitle('')
   }
 
@@ -308,10 +319,12 @@ function SectionBlock({ section, tasks, canMoveUp, canMoveDown }: {
               ) : (
                 <button
                   onClick={() => setAdding(true)}
-                  className="mt-0.5 flex h-9 cursor-pointer items-center gap-2 rounded-lg px-2 text-[13px] text-ink-faint transition-colors hover:text-ink-muted"
+                  className="group flex h-10 w-full cursor-pointer items-center gap-2.5 rounded-lg px-1 text-[13px] text-ink-faint transition-colors hover:text-ink-muted"
                 >
-                  <Plus size={14} />
-                  Tarefa
+                  <span className="flex size-[16px] items-center justify-center rounded-full text-primary-ink transition-colors group-hover:bg-primary group-hover:text-primary-fg">
+                    <Plus size={13} />
+                  </span>
+                  Adicionar tarefa
                 </button>
               )}
             </div>

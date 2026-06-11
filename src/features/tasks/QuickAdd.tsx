@@ -81,9 +81,11 @@ export function QuickAdd({ projectId = null, dueDate = null }: QuickAddProps) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.1 }}
             onClick={() => setOpen(true)}
-            className="flex h-11 w-full cursor-pointer items-center gap-2.5 rounded-xl border border-dashed border-line px-4 text-sm text-ink-faint transition-colors hover:border-line-strong hover:text-ink-muted"
+            className="group flex h-11 w-full cursor-pointer items-center gap-2.5 rounded-lg px-1 text-sm text-ink-faint transition-colors hover:text-ink-muted"
           >
-            <Plus size={16} />
+            <span className="flex size-[18px] items-center justify-center rounded-full text-primary-ink transition-colors group-hover:bg-primary group-hover:text-primary-fg">
+              <Plus size={15} />
+            </span>
             Adicionar tarefa
             <kbd className="ml-auto hidden rounded border border-line bg-surface px-1.5 py-0.5 text-[10px] font-medium text-ink-faint md:inline">
               Q

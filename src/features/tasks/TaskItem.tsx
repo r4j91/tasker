@@ -12,11 +12,11 @@ import { dueLabel, isOverdue, isDueToday, todayISO } from '../../lib/dates'
 import { playCompleteSound } from '../../lib/sound'
 import { cn } from '../../lib/cn'
 
-const PRIORITY_META: Record<Priority, { label: string; cls: string; tint?: string }> = {
-  1: { label: 'P1', cls: 'text-overdue',     tint: 'var(--overdue)' },
-  2: { label: 'P2', cls: 'text-today',       tint: 'var(--today)' },
-  3: { label: 'P3', cls: 'text-primary-ink', tint: 'var(--primary-ink)' },
-  4: { label: 'P4', cls: 'text-ink-faint' },
+const PRIORITY_META: Record<Priority, { label: string; tint?: string }> = {
+  1: { label: 'P1', tint: 'var(--priority-1)' },
+  2: { label: 'P2', tint: 'var(--priority-2)' },
+  3: { label: 'P3', tint: 'var(--priority-3)' },
+  4: { label: 'P4' },
 }
 
 const isTouch = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
@@ -128,9 +128,8 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
     <div
       ref={rootRef}
       className={cn(
-        'relative rounded-xl border border-transparent transition-colors',
-        expanded && 'border-line bg-surface-elevated shadow-[var(--shadow-md)]',
-        selected && !expanded && 'border-line-strong bg-surface',
+        'relative border-b border-line transition-colors',
+        selected && !expanded && 'bg-surface',
       )}
     >
       {/* Fundos revelados pelo swipe (apenas touch) */}
@@ -138,13 +137,13 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
         <>
           <motion.div
             style={{ opacity: rightHint }}
-            className="absolute inset-y-0 left-0 flex w-24 items-center justify-start rounded-l-xl bg-done-bg pl-4 text-done"
+            className="absolute inset-y-0 left-0 flex w-24 items-center justify-start bg-done-bg pl-4 text-done"
           >
             <Check size={18} />
           </motion.div>
           <motion.div
             style={{ opacity: leftHint }}
-            className="absolute inset-y-0 right-0 flex w-24 items-center justify-end rounded-r-xl bg-today-bg pr-4 text-today"
+            className="absolute inset-y-0 right-0 flex w-24 items-center justify-end bg-today-bg pr-4 text-today"
           >
             <CalendarClock size={18} />
           </motion.div>
@@ -163,25 +162,27 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
         onPointerUp={cancelLongPress}
         onPointerMove={maybeCancelLongPress}
         onPointerLeave={cancelLongPress}
-        className={cn('relative flex items-center gap-1 pl-2 pr-1', isTouch && 'touch-pan-y')}
+        className={cn('relative flex items-start gap-2 px-1', isTouch && 'touch-pan-y')}
       >
-        {selectionMode ? (
-          <span
-            className={cn(
-              'mx-1 flex size-[18px] shrink-0 items-center justify-center rounded-full border-2 transition-colors',
-              isChecked ? 'border-primary bg-primary text-primary-fg' : 'border-line-strong',
-            )}
-          >
-            {isChecked && <Check size={11} strokeWidth={3} />}
-          </span>
-        ) : (
-          <Checkbox
-            checked={task.completed}
-            onChange={complete}
-            tint={PRIORITY_META[task.priority].tint}
-            className="w-auto shrink-0"
-          />
-        )}
+        <span className="mt-[11px] shrink-0">
+          {selectionMode ? (
+            <span
+              className={cn(
+                'flex size-[18px] items-center justify-center rounded-full border-2 transition-colors',
+                isChecked ? 'border-primary bg-primary text-primary-fg' : 'border-line-strong',
+              )}
+            >
+              {isChecked && <Check size={11} strokeWidth={3} />}
+            </span>
+          ) : (
+            <Checkbox
+              checked={task.completed}
+              onChange={complete}
+              tint={PRIORITY_META[task.priority].tint}
+              className="w-auto min-h-0 py-0"
+            />
+          )}
+        </span>
         <button
           onClick={() => {
             /* Ignora o clique gerado ao soltar o dedo do toque longo */
@@ -190,29 +191,36 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
             setSelected(task.id)
             toggleExpanded(task.id)
           }}
-          className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-2 py-2 text-left"
+          className="flex min-h-11 min-w-0 flex-1 cursor-pointer flex-col justify-center gap-0.5 py-2.5 text-left"
         >
-          <span className="flex min-w-0 flex-col">
-            <span className={cn('truncate text-sm', task.completed && 'text-ink-faint line-through')}>
-              {task.title}
+          <span className={cn('truncate text-sm leading-5', task.completed && 'text-ink-faint line-through')}>
+            {task.title}
+          </span>
+
+          {/* Prévia da descrição (primeira linha) */}
+          {task.notes.trim() && !expanded && (
+            <span className="truncate text-xs text-ink-muted">
+              {task.notes.trim().split('\n')[0]}
             </span>
-            {/* Prévia da descrição (primeira linha) */}
-            {task.notes.trim() && !expanded && (
-              <span className="truncate text-xs text-ink-muted">
-                {task.notes.trim().split('\n')[0]}
-              </span>
-            )}
-          </span>
-          <span className="ml-auto flex shrink-0 items-center gap-2">
-            {due && (
-              <span className={cn('text-xs', dueTone)}>
-                {dueLabel(due)}{task.dueTime && ` · ${task.dueTime}`}
-              </span>
-            )}
-            {project && !hideProject && (
-              <span className="size-2 rounded-full" style={{ background: project.color }} />
-            )}
-          </span>
+          )}
+
+          {/* Metadados — abaixo do título, estilo Todoist */}
+          {(due || (project && !hideProject)) && (
+            <span className="flex w-full items-center gap-2 text-xs">
+              {due && (
+                <span className={cn('flex items-center gap-1', dueTone)}>
+                  <Calendar size={11} />
+                  {dueLabel(due)}{task.dueTime && ` ${task.dueTime}`}
+                </span>
+              )}
+              {project && !hideProject && (
+                <span className="ml-auto flex items-center gap-1.5 text-ink-faint">
+                  {project.name}
+                  <span className="size-2 rounded-full" style={{ background: project.color }} />
+                </span>
+              )}
+            </span>
+          )}
         </button>
       </motion.div>
 
@@ -295,10 +303,9 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
                       aria-label={`Prioridade ${p}`}
                       className={cn(
                         'flex size-6 cursor-pointer items-center justify-center rounded-md text-[11px] font-semibold transition-colors',
-                        task.priority === p
-                          ? cn('bg-surface', PRIORITY_META[p].cls)
-                          : 'text-ink-faint hover:bg-surface',
+                        task.priority === p ? 'bg-surface' : 'text-ink-faint hover:bg-surface',
                       )}
+                      style={task.priority === p ? { color: PRIORITY_META[p].tint ?? 'var(--ink-muted)' } : undefined}
                     >
                       {PRIORITY_META[p].label}
                     </button>
