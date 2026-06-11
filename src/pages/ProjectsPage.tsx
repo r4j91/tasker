@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { FolderOpen, Plus, ChevronRight } from 'lucide-react'
 import { useTaskStore } from '../stores/useTaskStore'
 import { PROJECT_COLORS } from '../features/tasks/types'
@@ -16,15 +16,17 @@ export function ProjectsPage() {
   const tasks = useTaskStore(s => s.tasks)
   const addProject = useTaskStore(s => s.addProject)
 
+  const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
   const [color, setColor] = useState<string>(PROJECT_COLORS[0])
 
   const create = () => {
     if (!name.trim()) return
-    addProject(name, color)
+    const p = addProject(name, color)
     setName('')
     setOpen(false)
+    navigate(`/projeto/${p.id}`)
   }
 
   return (
@@ -84,12 +86,16 @@ export function ProjectsPage() {
                   key={c}
                   onClick={() => setColor(c)}
                   aria-label={`Cor ${c}`}
-                  className={cn(
-                    'size-7 cursor-pointer rounded-full transition-transform hover:scale-110',
-                    color === c && 'ring-2 ring-primary-ink ring-offset-2 ring-offset-canvas',
-                  )}
-                  style={{ background: c }}
-                />
+                  className="flex size-11 cursor-pointer items-center justify-center md:size-9"
+                >
+                  <span
+                    className={cn(
+                      'size-8 rounded-full transition-transform hover:scale-110 md:size-7',
+                      color === c && 'ring-2 ring-primary-ink ring-offset-2 ring-offset-canvas',
+                    )}
+                    style={{ background: c }}
+                  />
+                </button>
               ))}
             </div>
           </div>

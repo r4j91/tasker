@@ -236,7 +236,7 @@ function SectionBlock({ section, tasks, canMoveUp, canMoveDown }: {
         <button
           onClick={() => updateSection(section.id, { collapsed: !section.collapsed })}
           aria-label={section.collapsed ? 'Expandir seção' : 'Recolher seção'}
-          className="flex size-6 cursor-pointer items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-surface hover:text-ink"
+          className="flex size-11 cursor-pointer items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-surface hover:text-ink md:size-6"
         >
           <motion.span
             animate={{ rotate: section.collapsed ? -90 : 0 }}
@@ -266,7 +266,7 @@ function SectionBlock({ section, tasks, canMoveUp, canMoveDown }: {
           <button
             onClick={() => setMenuOpen(o => !o)}
             aria-label={`Opções da seção ${section.name}`}
-            className="flex size-8 cursor-pointer items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-surface hover:text-ink"
+            className="flex size-11 cursor-pointer items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-surface hover:text-ink md:size-8"
           >
             <MoreHorizontal size={15} />
           </button>
@@ -319,7 +319,7 @@ function SectionBlock({ section, tasks, canMoveUp, canMoveDown }: {
               ) : (
                 <button
                   onClick={() => setAdding(true)}
-                  className="group flex h-10 w-full cursor-pointer items-center gap-2.5 rounded-lg px-1 text-[13px] text-ink-faint transition-colors hover:text-ink-muted"
+                  className="group flex h-11 w-full cursor-pointer items-center gap-2.5 rounded-lg px-1 text-sm text-ink-faint transition-colors hover:text-ink-muted md:h-10 md:text-[13px]"
                 >
                   <span className="flex size-[16px] items-center justify-center rounded-full text-primary-ink transition-colors group-hover:bg-primary group-hover:text-primary-fg">
                     <Plus size={13} />
@@ -345,7 +345,7 @@ function MenuItem({ icon: Icon, label, onClick, destructive }: {
     <button
       onClick={onClick}
       className={cn(
-        'flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm transition-colors',
+        'flex min-h-11 w-full cursor-pointer items-center gap-2 px-3 text-left text-sm transition-colors md:min-h-9',
         destructive ? 'text-overdue hover:bg-overdue-bg' : 'hover:bg-surface',
       )}
     >
@@ -416,7 +416,7 @@ function AddSectionEnd({ projectId }: { projectId: string }) {
   return (
     <button
       onClick={() => setOpen(true)}
-      className="mt-5 flex h-10 w-full cursor-pointer items-center gap-2 rounded-lg px-2 text-[13px] text-ink-faint transition-colors hover:text-ink-muted"
+      className="mt-5 flex h-11 w-full cursor-pointer items-center gap-2 rounded-lg px-2 text-sm text-ink-faint transition-colors hover:text-ink-muted md:h-10 md:text-[13px]"
     >
       <Plus size={14} />
       Adicionar seção

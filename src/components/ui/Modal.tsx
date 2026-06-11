@@ -59,7 +59,7 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
                 <button
                   onClick={onClose}
                   aria-label="Fechar"
-                  className="flex size-8 items-center justify-center rounded-lg text-ink-faint hover:text-ink hover:bg-surface transition-colors cursor-pointer"
+                  className="flex size-11 items-center justify-center rounded-lg text-ink-faint hover:text-ink hover:bg-surface transition-colors cursor-pointer md:size-8"
                 >
                   <X size={16} />
                 </button>

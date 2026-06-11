@@ -217,12 +217,16 @@ export function AppShell({ dark, onToggleTheme }: AppShellProps) {
                   key={c}
                   onClick={() => setProjectColor(c)}
                   aria-label={`Cor ${c}`}
-                  className={cn(
-                    'size-7 cursor-pointer rounded-full transition-transform hover:scale-110',
-                    projectColor === c && 'ring-2 ring-primary-ink ring-offset-2 ring-offset-canvas',
-                  )}
-                  style={{ background: c }}
-                />
+                  className="flex size-11 cursor-pointer items-center justify-center md:size-9"
+                >
+                  <span
+                    className={cn(
+                      'size-8 rounded-full transition-transform hover:scale-110 md:size-7',
+                      projectColor === c && 'ring-2 ring-primary-ink ring-offset-2 ring-offset-canvas',
+                    )}
+                    style={{ background: c }}
+                  />
+                </button>
               ))}
             </div>
           </div>

@@ -85,6 +85,7 @@ export function ProjectPage() {
           <Button
             variant="ghost" size="sm" aria-label="Opções do projeto"
             onClick={() => setMenuOpen(o => !o)}
+            className="max-md:min-w-11"
           >
             <MoreHorizontal size={16} />
           </Button>
@@ -94,13 +95,13 @@ export function ProjectPage() {
             <div className="absolute right-0 top-full z-20 mt-1 w-44 rounded-lg border border-line bg-surface-elevated py-1 shadow-[var(--shadow-md)]">
               <button
                 onClick={() => { setName(project.name); setEditing(true); setMenuOpen(false) }}
-                className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm hover:bg-surface"
+                className="flex min-h-11 w-full cursor-pointer items-center gap-2 px-3 text-left text-sm hover:bg-surface md:min-h-9"
               >
                 <Pencil size={13} /> Renomear
               </button>
               <button
                 onClick={() => { setConfirmDelete(true); setMenuOpen(false) }}
-                className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm text-overdue hover:bg-overdue-bg"
+                className="flex min-h-11 w-full cursor-pointer items-center gap-2 px-3 text-left text-sm text-overdue hover:bg-overdue-bg md:min-h-9"
               >
                 <Trash2 size={13} /> Excluir projeto
               </button>
