@@ -7,8 +7,8 @@ import { QuickAdd } from '../features/tasks/QuickAdd'
 import { EmptyState } from '../components/EmptyState'
 import { Button } from '../components/ui/Button'
 import { Modal } from '../components/ui/Modal'
-import { cn } from '../lib/cn'
 import { useRegisterVisible } from '../lib/useRegisterVisible'
+import { CompletedSection } from '../features/tasks/CompletedSection'
 
 export function ProjectPage() {
   const { id } = useParams<{ id: string }>()
@@ -28,7 +28,7 @@ export function ProjectPage() {
   const projectTasks = tasks
     .filter(t => !t.completed && t.projectId === project?.id)
     .sort((a, b) => a.order - b.order)
-  const doneCount = tasks.filter(t => t.completed && t.projectId === project?.id).length
+  const completedTasks = tasks.filter(t => t.completed && t.projectId === project?.id)
 
   useRegisterVisible(projectTasks.map(t => t.id))
 
@@ -96,12 +96,6 @@ export function ProjectPage() {
         </div>
       </div>
 
-      {doneCount > 0 && (
-        <p className={cn('mb-4 -mt-4 text-xs text-ink-faint')}>
-          {doneCount} {doneCount === 1 ? 'concluída' : 'concluídas'}
-        </p>
-      )}
-
       <QuickAdd projectId={project.id} />
 
       {projectTasks.length > 0 ? (
@@ -113,6 +107,7 @@ export function ProjectPage() {
           message="Adicione a primeira tarefa e dê vida a este projeto."
         />
       )}
+      <CompletedSection tasks={completedTasks} hideProject />
 
       <Modal open={confirmDelete} onClose={() => setConfirmDelete(false)} title="Excluir projeto">
         <p className="mb-4 text-sm text-ink-muted">

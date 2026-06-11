@@ -11,7 +11,7 @@ const idbStorage: StateStorage = {
 }
 
 interface PendingDelete {
-  task: Task
+  tasks: Task[]
   timeoutId: ReturnType<typeof setTimeout>
 }
 
@@ -24,7 +24,9 @@ interface TaskStore {
   addTask: (input: { title: string; dueDate?: string | null; dueTime?: string | null; projectId?: string | null; priority?: Priority }) => void
   updateTask: (id: string, patch: Partial<Omit<Task, 'id'>>) => void
   toggleComplete: (id: string) => void
+  completeMany: (ids: string[]) => void
   deleteTask: (id: string) => void
+  deleteMany: (ids: string[]) => void
   undoDelete: () => void
   reorderTasks: (ids: string[]) => void
 
@@ -78,18 +80,31 @@ export const useTaskStore = create<TaskStore>()(
           ),
         })),
 
-      deleteTask: (id) => {
+      completeMany: (ids) => {
+        const now = new Date().toISOString()
+        set(s => ({
+          tasks: s.tasks.map(t =>
+            ids.includes(t.id) && !t.completed
+              ? { ...t, completed: true, completedAt: now }
+              : t,
+          ),
+        }))
+      },
+
+      deleteTask: (id) => get().deleteMany([id]),
+
+      deleteMany: (ids) => {
         const { tasks, pendingDelete } = get()
-        const task = tasks.find(t => t.id === id)
-        if (!task) return
+        const removed = tasks.filter(t => ids.includes(t.id))
+        if (removed.length === 0) return
         /* Se já havia uma exclusão pendente, confirma ela imediatamente */
         if (pendingDelete) clearTimeout(pendingDelete.timeoutId)
         const timeoutId = setTimeout(() => {
-          set(s => (s.pendingDelete?.task.id === id ? { pendingDelete: null } : s))
+          set(s => (s.pendingDelete?.timeoutId === timeoutId ? { pendingDelete: null } : s))
         }, 5000)
         set(s => ({
-          tasks: s.tasks.filter(t => t.id !== id),
-          pendingDelete: { task, timeoutId },
+          tasks: s.tasks.filter(t => !ids.includes(t.id)),
+          pendingDelete: { tasks: removed, timeoutId },
         }))
       },
 
@@ -98,7 +113,7 @@ export const useTaskStore = create<TaskStore>()(
         if (!pendingDelete) return
         clearTimeout(pendingDelete.timeoutId)
         set(s => ({
-          tasks: [pendingDelete.task, ...s.tasks],
+          tasks: [...pendingDelete.tasks, ...s.tasks],
           pendingDelete: null,
         }))
       },

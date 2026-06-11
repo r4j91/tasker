@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
 import { Calendar, Flag, Trash2, FolderOpen, Check, CalendarClock } from 'lucide-react'
 import { format, addDays } from 'date-fns'
@@ -39,8 +39,38 @@ export function TaskItem({ task, hideProject }: TaskItemProps) {
   const toggleExpanded = useUiStore(s => s.toggleExpanded)
   const setSelected = useUiStore(s => s.setSelected)
   const soundEnabled = useUiStore(s => s.soundEnabled)
+  const selectionMode = useUiStore(s => s.selectionMode)
+  const isChecked = useUiStore(s => s.checkedIds.includes(task.id))
+  const enterSelection = useUiStore(s => s.enterSelection)
+  const toggleChecked = useUiStore(s => s.toggleChecked)
 
   const [scheduleOpen, setScheduleOpen] = useState(false)
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pressOrigin = useRef<{ x: number; y: number } | null>(null)
+  const longPressFired = useRef(false)
+
+  /* Toque longo (450ms) entra em modo seleção — apenas touch, tarefas ativas */
+  const startLongPress = (e: React.PointerEvent) => {
+    if (!isTouch || selectionMode || task.completed) return
+    pressOrigin.current = { x: e.clientX, y: e.clientY }
+    longPressTimer.current = setTimeout(() => {
+      longPressFired.current = true
+      enterSelection(task.id)
+      navigator.vibrate?.(10)
+    }, 450)
+  }
+  const cancelLongPress = () => {
+    if (longPressTimer.current) clearTimeout(longPressTimer.current)
+    longPressTimer.current = null
+    pressOrigin.current = null
+  }
+  /* Só cancela se o dedo realmente se moveu (jitter de touch dispara pointermove) */
+  const maybeCancelLongPress = (e: React.PointerEvent) => {
+    if (!pressOrigin.current) return
+    const dx = e.clientX - pressOrigin.current.x
+    const dy = e.clientY - pressOrigin.current.y
+    if (Math.hypot(dx, dy) > 8) cancelLongPress()
+  }
 
   const x = useMotionValue(0)
   const rightHint = useTransform(x, [0, SWIPE_THRESHOLD], [0, 1])
@@ -97,21 +127,42 @@ export function TaskItem({ task, hideProject }: TaskItemProps) {
 
       {/* Linha principal (arrastável no touch) */}
       <motion.div
-        drag={isTouch && !expanded ? 'x' : false}
+        drag={isTouch && !expanded && !selectionMode ? 'x' : false}
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.6}
         dragDirectionLock
         style={{ x }}
         onDragEnd={onDragEnd}
+        onPointerDown={startLongPress}
+        onPointerUp={cancelLongPress}
+        onPointerMove={maybeCancelLongPress}
+        onPointerLeave={cancelLongPress}
         className={cn('relative flex items-center gap-1 pl-2 pr-1', isTouch && 'touch-pan-y')}
       >
-        <Checkbox
-          checked={task.completed}
-          onChange={complete}
-          className="w-auto shrink-0"
-        />
+        {selectionMode ? (
+          <span
+            className={cn(
+              'mx-1 flex size-[18px] shrink-0 items-center justify-center rounded-full border-2 transition-colors',
+              isChecked ? 'border-primary bg-primary text-primary-fg' : 'border-line-strong',
+            )}
+          >
+            {isChecked && <Check size={11} strokeWidth={3} />}
+          </span>
+        ) : (
+          <Checkbox
+            checked={task.completed}
+            onChange={complete}
+            className="w-auto shrink-0"
+          />
+        )}
         <button
-          onClick={() => { setSelected(task.id); toggleExpanded(task.id) }}
+          onClick={() => {
+            /* Ignora o clique gerado ao soltar o dedo do toque longo */
+            if (longPressFired.current) { longPressFired.current = false; return }
+            if (selectionMode) { toggleChecked(task.id); return }
+            setSelected(task.id)
+            toggleExpanded(task.id)
+          }}
           className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-2 py-2 text-left"
         >
           <span className={cn('truncate text-sm', task.completed && 'text-ink-faint line-through')}>

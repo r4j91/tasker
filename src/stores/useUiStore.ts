@@ -8,6 +8,13 @@ interface UiStore {
   paletteOpen: boolean
   shortcutsOpen: boolean
   soundEnabled: boolean
+  /** Modo de seleção múltipla (toque longo no celular) */
+  selectionMode: boolean
+  checkedIds: string[]
+
+  enterSelection: (id: string) => void
+  toggleChecked: (id: string) => void
+  exitSelection: () => void
 
   setVisibleIds: (ids: string[]) => void
   moveSelection: (dir: 1 | -1) => void
@@ -26,6 +33,17 @@ export const useUiStore = create<UiStore>()((set, get) => ({
   paletteOpen: false,
   shortcutsOpen: false,
   soundEnabled: localStorage.getItem('sound') === 'on',
+  selectionMode: false,
+  checkedIds: [],
+
+  enterSelection: (id) => set({ selectionMode: true, checkedIds: [id], expandedId: null }),
+  toggleChecked: (id) =>
+    set(s => ({
+      checkedIds: s.checkedIds.includes(id)
+        ? s.checkedIds.filter(c => c !== id)
+        : [...s.checkedIds, id],
+    })),
+  exitSelection: () => set({ selectionMode: false, checkedIds: [] }),
 
   setVisibleIds: (ids) =>
     set(s => ({

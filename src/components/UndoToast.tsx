@@ -16,7 +16,11 @@ export function UndoToast() {
           exit={{ opacity: 0, y: 16, x: '-50%' }}
           transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
-          <span>Tarefa excluída</span>
+          <span>
+            {pendingDelete.tasks.length === 1
+              ? 'Tarefa excluída'
+              : `${pendingDelete.tasks.length} tarefas excluídas`}
+          </span>
           <button
             onClick={undoDelete}
             className="cursor-pointer font-semibold text-canvas underline-offset-2 hover:underline"

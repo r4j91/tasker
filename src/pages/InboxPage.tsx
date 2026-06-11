@@ -5,12 +5,14 @@ import { QuickAdd } from '../features/tasks/QuickAdd'
 import { PageHeader } from '../components/PageHeader'
 import { EmptyState } from '../components/EmptyState'
 import { useRegisterVisible } from '../lib/useRegisterVisible'
+import { CompletedSection } from '../features/tasks/CompletedSection'
 
 export function InboxPage() {
   const tasks = useTaskStore(s => s.tasks)
   const inbox = tasks
     .filter(t => !t.completed && !t.projectId)
     .sort((a, b) => a.order - b.order)
+  const completed = tasks.filter(t => t.completed && !t.projectId)
 
   useRegisterVisible(inbox.map(t => t.id))
 
@@ -30,6 +32,7 @@ export function InboxPage() {
           message="Aperte Q ou toque em adicionar para capturar o que vier à cabeça."
         />
       )}
+      <CompletedSection tasks={completed} />
     </div>
   )
 }

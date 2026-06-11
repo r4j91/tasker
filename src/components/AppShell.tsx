@@ -10,6 +10,7 @@ import { Modal } from './ui/Modal'
 import { Input } from './ui/Input'
 import { Button } from './ui/Button'
 import { UndoToast } from './UndoToast'
+import { SelectionBar } from './SelectionBar'
 import { CommandPalette } from './CommandPalette'
 import { ShortcutsModal } from './ShortcutsModal'
 import { cn } from '../lib/cn'
@@ -233,6 +234,7 @@ export function AppShell({ dark, onToggleTheme }: AppShellProps) {
       </Modal>
 
       <UndoToast />
+      <SelectionBar />
       <CommandPalette onToggleTheme={onToggleTheme} />
       <ShortcutsModal />
     </div>
