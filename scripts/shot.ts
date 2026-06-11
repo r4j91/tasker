@@ -2,6 +2,7 @@
 import { chromium } from 'playwright'
 
 const BASE = process.env.SHOT_URL ?? 'http://localhost:5173'
+const PALETTE = process.env.PALETTE // 'pastel' ou vazio
 
 const browser = await chromium.launch()
 
@@ -12,9 +13,11 @@ for (const theme of ['light', 'dark'] as const) {
   })
   const page = await ctx.newPage()
   await page.addInitScript(t => localStorage.setItem('theme', t), theme)
-  await page.goto(`${BASE}/design-system`, { waitUntil: 'networkidle' })
+  const query = PALETTE ? `?palette=${PALETTE}` : ''
+  const suffix = PALETTE ? `-${PALETTE}` : ''
+  await page.goto(`${BASE}/design-system${query}`, { waitUntil: 'networkidle' })
   await page.waitForTimeout(600)
-  await page.screenshot({ path: `/tmp/tasker-ds-${theme}.png`, fullPage: true })
+  await page.screenshot({ path: `/tmp/tasker-ds-${theme}${suffix}.png`, fullPage: true })
   await ctx.close()
 }
 

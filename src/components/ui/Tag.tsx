@@ -12,7 +12,7 @@ interface TagProps {
 
 const variants: Record<TagVariant, string> = {
   default: 'bg-surface text-ink-muted border border-line',
-  primary: 'bg-primary-subtle text-primary',
+  primary: 'bg-primary-subtle text-primary-ink',
   today:   'bg-today-bg text-today',
   overdue: 'bg-overdue-bg text-overdue',
   done:    'bg-done-bg text-done',
