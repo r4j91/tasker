@@ -14,7 +14,9 @@ const base =
   'inline-flex items-center justify-center gap-1.5 font-medium whitespace-nowrap ' +
   'rounded-lg select-none cursor-pointer transition-colors duration-150 ' +
   'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ' +
-  'disabled:opacity-45 disabled:pointer-events-none'
+  'disabled:opacity-45 disabled:pointer-events-none ' +
+  /* Toque mínimo de 44px no mobile, independente do tamanho visual */
+  'max-md:min-h-11'
 
 const variants: Record<Variant, string> = {
   primary:     'bg-primary text-primary-fg hover:bg-primary-hover',

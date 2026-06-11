@@ -164,7 +164,7 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
         onPointerLeave={cancelLongPress}
         className={cn('relative flex items-start gap-2 px-1', isTouch && 'touch-pan-y')}
       >
-        <span className="mt-[11px] shrink-0">
+        <span className="mt-[13px] shrink-0">
           {selectionMode ? (
             <span
               className={cn(
@@ -182,7 +182,8 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
               checked={task.completed}
               onChange={complete}
               tint={PRIORITY_META[task.priority].tint}
-              className="w-auto min-h-0 py-0"
+              /* Toque de 44px com visual de 18px */
+              className="relative z-10 -m-[13px] w-auto min-h-0 p-[13px]"
             />
           )}
         </span>
@@ -194,25 +195,25 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
             setSelected(task.id)
             toggleExpanded(task.id)
           }}
-          className="flex min-h-11 min-w-0 flex-1 cursor-pointer flex-col justify-center gap-0.5 py-2.5 text-left"
+          className="flex min-h-12 min-w-0 flex-1 cursor-pointer flex-col justify-center gap-0.5 py-3 text-left"
         >
-          <span className={cn('truncate text-sm leading-5', task.completed && 'text-ink-faint line-through')}>
+          <span className={cn('truncate text-base leading-6 md:text-sm md:leading-5', task.completed && 'text-ink-faint line-through')}>
             {task.title}
           </span>
 
           {/* Prévia da descrição (primeira linha) */}
           {task.notes.trim() && !expanded && (
-            <span className="truncate text-xs text-ink-muted">
+            <span className="truncate text-[13px] text-ink-muted md:text-xs">
               {task.notes.trim().split('\n')[0]}
             </span>
           )}
 
           {/* Metadados — abaixo do título, estilo Todoist */}
           {(due || (project && !hideProject)) && (
-            <span className="flex w-full items-center gap-2 text-xs">
+            <span className="flex w-full items-center gap-2 text-[13px] md:text-xs">
               {due && (
                 <span className={cn('flex items-center gap-1', dueTone)}>
-                  <Calendar size={11} />
+                  <Calendar size={12} />
                   {dueLabel(due)}{task.dueTime && ` ${task.dueTime}`}
                 </span>
               )}
@@ -247,32 +248,34 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
               />
 
               <div className="flex flex-wrap items-center gap-2">
-                <label className="flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-2.5 text-xs text-ink-muted transition-colors hover:border-line-strong">
-                  <Calendar size={13} />
+                <label className="flex h-11 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 text-[13px] text-ink-muted transition-colors hover:border-line-strong md:h-8 md:px-2.5 md:text-xs">
+                  <Calendar size={14} />
                   <input
                     type="date"
+                    lang="pt-BR"
                     value={task.dueDate ?? ''}
                     onChange={e => updateTask(task.id, { dueDate: e.target.value || null })}
-                    className="cursor-pointer bg-transparent text-xs text-ink outline-none"
+                    className="h-full cursor-pointer bg-transparent text-[13px] text-ink outline-none md:text-xs"
                   />
                 </label>
 
-                <label className="flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-2.5 text-xs text-ink-muted transition-colors hover:border-line-strong">
-                  <CalendarClock size={13} />
+                <label className="flex h-11 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 text-[13px] text-ink-muted transition-colors hover:border-line-strong md:h-8 md:px-2.5 md:text-xs">
+                  <CalendarClock size={14} />
                   <input
                     type="time"
+                    lang="pt-BR"
                     value={task.dueTime ?? ''}
                     onChange={e => updateTask(task.id, { dueTime: e.target.value || null })}
-                    className="cursor-pointer bg-transparent text-xs text-ink outline-none"
+                    className="h-full cursor-pointer bg-transparent text-[13px] text-ink outline-none md:text-xs"
                   />
                 </label>
 
-                <label className="flex h-8 items-center gap-1.5 rounded-lg border border-line px-2.5 text-xs text-ink-muted transition-colors hover:border-line-strong">
-                  <FolderOpen size={13} />
+                <label className="flex h-11 items-center gap-1.5 rounded-lg border border-line px-3 text-[13px] text-ink-muted transition-colors hover:border-line-strong md:h-8 md:px-2.5 md:text-xs">
+                  <FolderOpen size={14} />
                   <select
                     value={task.projectId ?? ''}
                     onChange={e => updateTask(task.id, { projectId: e.target.value || null, sectionId: null })}
-                    className="cursor-pointer bg-transparent text-xs text-ink outline-none"
+                    className="h-full cursor-pointer bg-transparent text-[13px] text-ink outline-none md:text-xs"
                   >
                     <option value="">Entrada</option>
                     {projects.map(p => (
@@ -283,12 +286,12 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
 
                 {/* Seção — visível quando o projeto tem seções */}
                 {taskSections.length > 0 && (
-                  <label className="flex h-8 items-center gap-1.5 rounded-lg border border-line px-2.5 text-xs text-ink-muted transition-colors hover:border-line-strong">
-                    <Rows3 size={13} />
+                  <label className="flex h-11 items-center gap-1.5 rounded-lg border border-line px-3 text-[13px] text-ink-muted transition-colors hover:border-line-strong md:h-8 md:px-2.5 md:text-xs">
+                    <Rows3 size={14} />
                     <select
                       value={task.sectionId ?? ''}
                       onChange={e => updateTask(task.id, { sectionId: e.target.value || null })}
-                      className="cursor-pointer bg-transparent text-xs text-ink outline-none"
+                      className="h-full cursor-pointer bg-transparent text-[13px] text-ink outline-none md:text-xs"
                     >
                       <option value="">Sem seção</option>
                       {taskSections.map(sec => (
@@ -298,14 +301,14 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
                   </label>
                 )}
 
-                <div className="flex h-8 items-center gap-0.5 rounded-lg border border-line px-1">
+                <div className="flex h-11 items-center gap-1 rounded-lg border border-line px-1.5 md:h-8 md:gap-0.5 md:px-1">
                   {([1, 2, 3, 4] as Priority[]).map(p => (
                     <button
                       key={p}
                       onClick={() => updateTask(task.id, { priority: p })}
                       aria-label={`Prioridade ${p}`}
                       className={cn(
-                        'flex size-6 cursor-pointer items-center justify-center rounded-md text-[11px] font-semibold transition-colors',
+                        'flex size-9 cursor-pointer items-center justify-center rounded-md text-[13px] font-semibold transition-colors md:size-6 md:text-[11px]',
                         task.priority === p ? 'bg-surface' : 'text-ink-faint hover:bg-surface',
                       )}
                       style={task.priority === p ? { color: PRIORITY_META[p].tint ?? 'var(--ink-muted)' } : undefined}
@@ -319,7 +322,7 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
                   variant="ghost"
                   size="sm"
                   onClick={() => deleteTask(task.id)}
-                  className="ml-auto text-overdue hover:text-overdue hover:bg-overdue-bg"
+                  className="ml-auto h-11 text-overdue hover:text-overdue hover:bg-overdue-bg md:h-8"
                 >
                   <Trash2 size={14} />
                   Excluir

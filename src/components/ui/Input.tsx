@@ -31,7 +31,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={inputId}
             className={cn(
-              'h-10 w-full rounded-lg border bg-canvas text-sm text-ink',
+              'h-11 w-full rounded-lg border bg-canvas text-base text-ink md:h-10 md:text-sm',
               icon ? 'pl-9 pr-3' : 'px-3',
               'placeholder:text-ink-faint',
               'transition-colors duration-150',

@@ -46,21 +46,21 @@ export function SelectionBar() {
               <button
                 onClick={completeAll}
                 disabled={count === 0}
-                className="flex h-9 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-done transition-colors hover:bg-done-bg disabled:opacity-40"
+                className="flex h-11 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-done transition-colors hover:bg-done-bg disabled:opacity-40 md:h-9"
               >
                 <Check size={15} /> Concluir
               </button>
               <button
                 onClick={deleteAll}
                 disabled={count === 0}
-                className="flex h-9 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-overdue transition-colors hover:bg-overdue-bg disabled:opacity-40"
+                className="flex h-11 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-overdue transition-colors hover:bg-overdue-bg disabled:opacity-40 md:h-9"
               >
                 <Trash2 size={15} /> Excluir
               </button>
               <button
                 onClick={exitSelection}
                 aria-label="Cancelar seleção"
-                className="flex size-9 cursor-pointer items-center justify-center rounded-lg text-ink-faint transition-colors hover:bg-surface hover:text-ink"
+                className="flex size-11 cursor-pointer items-center justify-center rounded-lg text-ink-faint transition-colors hover:bg-surface hover:text-ink md:size-9"
               >
                 <X size={16} />
               </button>

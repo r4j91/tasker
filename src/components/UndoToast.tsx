@@ -23,7 +23,7 @@ export function UndoToast() {
           </span>
           <button
             onClick={undoDelete}
-            className="cursor-pointer font-semibold text-canvas underline-offset-2 hover:underline"
+            className="-my-2 min-h-11 cursor-pointer px-2 font-semibold text-canvas underline-offset-2 hover:underline"
           >
             Desfazer
           </button>

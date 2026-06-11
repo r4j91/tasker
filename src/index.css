@@ -157,6 +157,13 @@ body {
   outline-offset: 2px;
 }
 
+/* Mobile: fonte mínima de 16px em campos evita o zoom automático do iOS */
+@media (max-width: 767px) {
+  input, textarea, select {
+    font-size: 16px;
+  }
+}
+
 /* Movimento reduzido */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

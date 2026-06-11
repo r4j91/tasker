@@ -18,8 +18,9 @@ const SEGMENT_STYLE: Record<SegmentType, string> = {
   priority: 'bg-overdue-bg text-overdue rounded',
 }
 
-/* Tipografia idêntica entre input e overlay — qualquer divergência desalinha o destaque */
-const TEXT_CLS = 'text-sm font-sans tracking-normal whitespace-pre'
+/* Tipografia idêntica entre input e overlay — qualquer divergência desalinha o
+   destaque. 16px no mobile (também evita o zoom do iOS), 14px no desktop. */
+const TEXT_CLS = 'text-base md:text-sm font-sans tracking-normal whitespace-pre'
 
 export const SmartInput = forwardRef<HTMLInputElement, SmartInputProps>(
   ({ value, onChange, onParse, className, ...props }, ref) => {

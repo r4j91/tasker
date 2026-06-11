@@ -77,7 +77,7 @@ export function ProjectPage() {
               <button onClick={saveName} aria-label="Salvar nome" className="cursor-pointer text-done"><Check size={18} /></button>
             </div>
           ) : (
-            <h1 className="truncate text-2xl font-bold tracking-[-0.02em]">{project.name}</h1>
+            <h1 className="truncate text-[28px] font-bold tracking-[-0.02em] md:text-2xl">{project.name}</h1>
           )}
         </div>
 
