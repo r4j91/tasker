@@ -1,12 +1,146 @@
 @import "tailwindcss";
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* ─── Dark mode via .dark class ─────────────────────────────────────── */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ─── Design tokens ─────────────────────────────────────────────────── */
+:root {
+  /* Superfícies — neutro quente sutil */
+  --canvas:            oklch(0.990 0.003 85);
+  --surface:           oklch(0.964 0.004 85);
+  --surface-elevated:  oklch(1.000 0.000 0);
+
+  /* Texto — tinta com leve frieza azulada */
+  --ink:               oklch(0.180 0.014 262);
+  --ink-muted:         oklch(0.450 0.014 262);
+  --ink-faint:         oklch(0.600 0.010 262);
+
+  /* Linhas */
+  --line:              oklch(0.905 0.005 85);
+  --line-strong:       oklch(0.820 0.007 85);
+
+  /* Marca — azul-tinta profundo */
+  --primary:           oklch(0.400 0.125 262);
+  --primary-hover:     oklch(0.340 0.125 262);
+  --primary-subtle:    oklch(0.945 0.018 262);
+  --primary-fg:        oklch(1.000 0.000 0);
+
+  /* Acento — mel */
+  --accent:            oklch(0.740 0.125 78);
+  --accent-fg:         oklch(0.280 0.060 78);
+
+  /* Semânticas */
+  --overdue:           oklch(0.550 0.185 25);
+  --overdue-bg:        oklch(0.957 0.020 25);
+  --today:             oklch(0.620 0.145 55);
+  --today-bg:          oklch(0.960 0.028 70);
+  --done:              oklch(0.550 0.115 155);
+  --done-bg:           oklch(0.952 0.024 155);
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px oklch(0.2 0.02 262 / 0.06);
+  --shadow-md: 0 2px 8px oklch(0.2 0.02 262 / 0.08), 0 1px 2px oklch(0.2 0.02 262 / 0.05);
+  --shadow-lg: 0 8px 28px oklch(0.2 0.02 262 / 0.12), 0 2px 8px oklch(0.2 0.02 262 / 0.06);
+}
+
+.dark {
+  --canvas:            oklch(0.145 0.007 262);
+  --surface:           oklch(0.185 0.008 262);
+  --surface-elevated:  oklch(0.225 0.009 262);
+
+  --ink:               oklch(0.930 0.005 262);
+  --ink-muted:         oklch(0.670 0.010 262);
+  --ink-faint:         oklch(0.500 0.010 262);
+
+  --line:              oklch(0.265 0.009 262);
+  --line-strong:       oklch(0.350 0.011 262);
+
+  --primary:           oklch(0.600 0.112 262);
+  --primary-hover:     oklch(0.655 0.112 262);
+  --primary-subtle:    oklch(0.225 0.038 262);
+  --primary-fg:        oklch(0.990 0.003 262);
+
+  --accent:            oklch(0.780 0.115 78);
+  --accent-fg:         oklch(0.200 0.050 78);
+
+  --overdue:           oklch(0.660 0.155 25);
+  --overdue-bg:        oklch(0.215 0.045 25);
+  --today:             oklch(0.730 0.125 60);
+  --today-bg:          oklch(0.215 0.040 65);
+  --done:              oklch(0.680 0.105 155);
+  --done-bg:           oklch(0.205 0.032 155);
+
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.35);
+  --shadow-md: 0 2px 8px oklch(0 0 0 / 0.40), 0 1px 2px oklch(0 0 0 / 0.30);
+  --shadow-lg: 0 8px 28px oklch(0 0 0 / 0.50), 0 2px 8px oklch(0 0 0 / 0.35);
+}
+
+/* ─── Tailwind theme mapping ────────────────────────────────────────── */
+@theme inline {
+  --color-canvas:           var(--canvas);
+  --color-surface:          var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-ink:              var(--ink);
+  --color-ink-muted:        var(--ink-muted);
+  --color-ink-faint:        var(--ink-faint);
+  --color-line:             var(--line);
+  --color-line-strong:      var(--line-strong);
+  --color-primary:          var(--primary);
+  --color-primary-hover:    var(--primary-hover);
+  --color-primary-subtle:   var(--primary-subtle);
+  --color-primary-fg:       var(--primary-fg);
+  --color-accent:           var(--accent);
+  --color-accent-fg:        var(--accent-fg);
+  --color-overdue:          var(--overdue);
+  --color-overdue-bg:       var(--overdue-bg);
+  --color-today:            var(--today);
+  --color-today-bg:         var(--today-bg);
+  --color-done:             var(--done);
+  --color-done-bg:          var(--done-bg);
+
+  --font-sans: 'Inter Variable', system-ui, sans-serif;
+}
+
+/* ─── Base ──────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  overflow-x: clip;
 }
 
 body {
+  margin: 0;
+  font-family: 'Inter Variable', system-ui, sans-serif;
+  background-color: var(--canvas);
+  color: var(--ink);
+  line-height: 1.5;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  width: 100%;
+}
+
+/* Container central — CSS puro, independe do Tailwind */
+.page-wrap {
+  width: 100%;
+  max-width: 640px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+/* Foco visível para teclado */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Movimento reduzido */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
