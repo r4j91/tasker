@@ -2,12 +2,11 @@ import { useState, type ReactNode } from 'react'
 import { Sun, Moon, Search, Mail } from 'lucide-react'
 import { Button, Input, Checkbox, Modal, Tooltip, Tag } from '../components/ui'
 
-interface DesignSystemProps {
-  dark: boolean
-  onToggle: () => void
-}
+import { useUiStore } from '../stores/useUiStore'
 
-export function DesignSystem({ dark, onToggle }: DesignSystemProps) {
+export function DesignSystem() {
+  const dark = useUiStore(s => s.dark)
+  const onToggle = useUiStore(s => s.toggleDark)
   const [checks, setChecks] = useState({ a: false, b: true, c: false })
   const [modalOpen, setModalOpen] = useState(false)
 

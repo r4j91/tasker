@@ -301,14 +301,14 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
                   </label>
                 )}
 
-                <div className="flex h-11 items-center gap-1 rounded-lg border border-line px-1.5 md:h-8 md:gap-0.5 md:px-1">
+                <div className="flex h-11 items-center rounded-lg border border-line md:h-8 md:gap-0.5 md:px-1">
                   {([1, 2, 3, 4] as Priority[]).map(p => (
                     <button
                       key={p}
                       onClick={() => updateTask(task.id, { priority: p })}
                       aria-label={`Prioridade ${p}`}
                       className={cn(
-                        'flex size-9 cursor-pointer items-center justify-center rounded-md text-[13px] font-semibold transition-colors md:size-6 md:text-[11px]',
+                        'flex size-11 cursor-pointer items-center justify-center rounded-md text-[13px] font-semibold transition-colors md:size-6 md:text-[11px]',
                         task.priority === p ? 'bg-surface' : 'text-ink-faint hover:bg-surface',
                       )}
                       style={task.priority === p ? { color: PRIORITY_META[p].tint ?? 'var(--ink-muted)' } : undefined}

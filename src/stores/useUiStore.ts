@@ -8,6 +8,9 @@ interface UiStore {
   paletteOpen: boolean
   shortcutsOpen: boolean
   soundEnabled: boolean
+  /** Tema escuro (persistido em localStorage) */
+  dark: boolean
+  toggleDark: () => void
   /** Modo de seleção múltipla (toque longo no celular) */
   selectionMode: boolean
   checkedIds: string[]
@@ -26,6 +29,12 @@ interface UiStore {
   setSoundEnabled: (on: boolean) => void
 }
 
+const initialDark = (() => {
+  const stored = localStorage.getItem('theme')
+  if (stored) return stored === 'dark'
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+})()
+
 export const useUiStore = create<UiStore>()((set, get) => ({
   visibleIds: [],
   selectedId: null,
@@ -33,6 +42,12 @@ export const useUiStore = create<UiStore>()((set, get) => ({
   paletteOpen: false,
   shortcutsOpen: false,
   soundEnabled: localStorage.getItem('sound') === 'on',
+  dark: initialDark,
+  toggleDark: () => {
+    const dark = !get().dark
+    localStorage.setItem('theme', dark ? 'dark' : 'light')
+    set({ dark })
+  },
   selectionMode: false,
   checkedIds: [],
 

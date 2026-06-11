@@ -15,10 +15,6 @@ import { CommandPalette } from './CommandPalette'
 import { ShortcutsModal } from './ShortcutsModal'
 import { cn } from '../lib/cn'
 
-interface AppShellProps {
-  dark: boolean
-  onToggleTheme: () => void
-}
 
 const navItem = ({ isActive }: { isActive: boolean }) =>
   cn(
@@ -28,7 +24,9 @@ const navItem = ({ isActive }: { isActive: boolean }) =>
       : 'text-ink-muted hover:text-ink hover:bg-surface',
   )
 
-export function AppShell({ dark, onToggleTheme }: AppShellProps) {
+export function AppShell() {
+  const dark = useUiStore(s => s.dark)
+  const onToggleTheme = useUiStore(s => s.toggleDark)
   const projects = useTaskStore(s => s.projects)
   const tasks = useTaskStore(s => s.tasks)
   const addProject = useTaskStore(s => s.addProject)
@@ -167,13 +165,13 @@ export function AppShell({ dark, onToggleTheme }: AppShellProps) {
       </aside>
 
       {/* ── Conteúdo ── */}
-      <main className="pb-24 md:pb-10 md:pl-60">
+      <main className="pb-24 pt-[env(safe-area-inset-top)] md:pb-10 md:pl-60">
         <Outlet />
       </main>
 
       {/* ── Navegação inferior (mobile) ── */}
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-canvas/90 backdrop-blur-md md:hidden">
-        <div className="grid grid-cols-4 px-2 pb-[env(safe-area-inset-bottom)]">
+        <div className="grid grid-cols-5 px-1 pb-[env(safe-area-inset-bottom)]">
           {[
             { to: '/', icon: Inbox, label: 'Entrada', end: true },
             { to: '/hoje', icon: CalendarDays, label: 'Hoje' },
@@ -186,15 +184,22 @@ export function AppShell({ dark, onToggleTheme }: AppShellProps) {
               end={end}
               className={({ isActive }) =>
                 cn(
-                  'flex min-h-[52px] flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors',
+                  'flex min-h-[52px] flex-col items-center justify-center gap-0.5 text-[11px] font-medium transition-colors',
                   isActive ? 'text-primary-ink' : 'text-ink-faint',
                 )
               }
             >
-              <Icon size={20} />
+              <Icon size={21} />
               {label}
             </NavLink>
           ))}
+          <button
+            onClick={() => useUiStore.getState().setPaletteOpen(true)}
+            className="flex min-h-[52px] cursor-pointer flex-col items-center justify-center gap-0.5 text-[11px] font-medium text-ink-faint transition-colors"
+          >
+            <Search size={21} />
+            Buscar
+          </button>
         </div>
       </nav>
 
@@ -239,7 +244,7 @@ export function AppShell({ dark, onToggleTheme }: AppShellProps) {
 
       <UndoToast />
       <SelectionBar />
-      <CommandPalette onToggleTheme={onToggleTheme} />
+      <CommandPalette />
       <ShortcutsModal />
     </div>
   )

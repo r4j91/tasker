@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AppShell } from './components/AppShell'
 import { InboxPage } from './pages/InboxPage'
@@ -7,30 +7,20 @@ import { UpcomingPage } from './pages/UpcomingPage'
 import { ProjectPage } from './pages/ProjectPage'
 import { ProjectsPage } from './pages/ProjectsPage'
 import { DesignSystem } from './pages/DesignSystem'
+import { useUiStore } from './stores/useUiStore'
 
-function useTheme() {
-  const [dark, setDark] = useState(() => {
-    const stored = localStorage.getItem('theme')
-    if (stored) return stored === 'dark'
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
-  })
+export default function App() {
+  const dark = useUiStore(s => s.dark)
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark)
-    localStorage.setItem('theme', dark ? 'dark' : 'light')
   }, [dark])
-
-  return { dark, toggle: () => setDark(d => !d) }
-}
-
-export default function App() {
-  const { dark, toggle } = useTheme()
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/design-system" element={<DesignSystem dark={dark} onToggle={toggle} />} />
-        <Route element={<AppShell dark={dark} onToggleTheme={toggle} />}>
+        <Route path="/design-system" element={<DesignSystem />} />
+        <Route element={<AppShell />}>
           <Route path="/" element={<InboxPage />} />
           <Route path="/hoje" element={<TodayPage />} />
           <Route path="/em-breve" element={<UpcomingPage />} />

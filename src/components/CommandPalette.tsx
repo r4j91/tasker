@@ -21,11 +21,7 @@ interface PaletteItem {
   run: () => void
 }
 
-interface CommandPaletteProps {
-  onToggleTheme: () => void
-}
-
-export function CommandPalette({ onToggleTheme }: CommandPaletteProps) {
+export function CommandPalette() {
   const open = useUiStore(s => s.paletteOpen)
   const setOpen = useUiStore(s => s.setPaletteOpen)
 
@@ -55,7 +51,7 @@ export function CommandPalette({ onToggleTheme }: CommandPaletteProps) {
             onClick={() => setOpen(false)}
           />
           {/* Conteúdo remonta a cada abertura — estado sempre limpo */}
-          <PaletteContent onToggleTheme={onToggleTheme} onClose={() => setOpen(false)} />
+          <PaletteContent onClose={() => setOpen(false)} />
         </div>
       )}
     </AnimatePresence>,
@@ -63,7 +59,8 @@ export function CommandPalette({ onToggleTheme }: CommandPaletteProps) {
   )
 }
 
-function PaletteContent({ onToggleTheme, onClose }: { onToggleTheme: () => void; onClose: () => void }) {
+function PaletteContent({ onClose }: { onClose: () => void }) {
+  const onToggleTheme = useUiStore(s => s.toggleDark)
   const setShortcutsOpen = useUiStore(s => s.setShortcutsOpen)
   const soundEnabled = useUiStore(s => s.soundEnabled)
   const setSoundEnabled = useUiStore(s => s.setSoundEnabled)
@@ -170,7 +167,8 @@ function PaletteContent({ onToggleTheme, onClose }: { onToggleTheme: () => void;
               onClick={item.run}
               onMouseMove={() => setIndex(i)}
               className={cn(
-                'flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm transition-colors',
+                'flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-left text-sm transition-colors',
+                'min-h-11 md:min-h-9',
                 i === index ? 'bg-primary-subtle text-primary-ink' : 'text-ink',
               )}
             >
