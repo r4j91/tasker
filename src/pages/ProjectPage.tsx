@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { FolderOpen, MoreHorizontal, Trash2, Pencil, Check } from 'lucide-react'
 import { useTaskStore } from '../stores/useTaskStore'
-import { TaskList } from '../features/tasks/TaskList'
+import { SectionedTasks } from '../features/tasks/SectionedTasks'
 import { QuickAdd } from '../features/tasks/QuickAdd'
 import { EmptyState } from '../components/EmptyState'
 import { Button } from '../components/ui/Button'
@@ -14,6 +14,7 @@ export function ProjectPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const projects = useTaskStore(s => s.projects)
+  const sections = useTaskStore(s => s.sections)
   const tasks = useTaskStore(s => s.tasks)
   const updateProject = useTaskStore(s => s.updateProject)
   const deleteProject = useTaskStore(s => s.deleteProject)
@@ -25,12 +26,22 @@ export function ProjectPage() {
 
   const project = projects.find(p => p.id === id)
 
+  const projectSections = sections
+    .filter(s => s.projectId === project?.id)
+    .sort((a, b) => a.order - b.order)
+  const hasSections = projectSections.length > 0
+
   const projectTasks = tasks
     .filter(t => !t.completed && t.projectId === project?.id)
     .sort((a, b) => a.order - b.order)
   const completedTasks = tasks.filter(t => t.completed && t.projectId === project?.id)
 
-  useRegisterVisible(projectTasks.map(t => t.id))
+  /* Ordem visível: grupo sem seção primeiro, depois cada seção */
+  const visibleOrdered = [
+    ...projectTasks.filter(t => !t.sectionId),
+    ...projectSections.flatMap(sec => projectTasks.filter(t => t.sectionId === sec.id)),
+  ]
+  useRegisterVisible(visibleOrdered.map(t => t.id))
 
   if (!project) {
     return (
@@ -98,15 +109,14 @@ export function ProjectPage() {
 
       <QuickAdd projectId={project.id} />
 
-      {projectTasks.length > 0 ? (
-        <TaskList tasks={projectTasks} hideProject />
-      ) : (
+      {projectTasks.length === 0 && !hasSections && (
         <EmptyState
           icon={FolderOpen}
           title="Projeto em branco"
           message="Adicione a primeira tarefa e dê vida a este projeto."
         />
       )}
+      <SectionedTasks projectId={project.id} />
       <CompletedSection tasks={completedTasks} hideProject />
 
       <Modal open={confirmDelete} onClose={() => setConfirmDelete(false)} title="Excluir projeto">

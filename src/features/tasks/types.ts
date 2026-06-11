@@ -11,6 +11,8 @@ export interface Task {
   /** Hora opcional (HH:mm) */
   dueTime: string | null
   projectId: string | null
+  /** Seção dentro do projeto (opcional) */
+  sectionId: string | null
   labels: string[]
   priority: Priority
   order: number
@@ -22,6 +24,14 @@ export interface Project {
   name: string
   color: string
   order: number
+}
+
+export interface Section {
+  id: string
+  projectId: string
+  name: string
+  order: number
+  collapsed: boolean
 }
 
 export const PROJECT_COLORS = [

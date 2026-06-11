@@ -26,9 +26,11 @@ const SWIPE_THRESHOLD = 90
 interface TaskItemProps {
   task: Task
   hideProject?: boolean
+  /** Desativa o toque longo de seleção (em contextos com drag próprio) */
+  disableLongPress?: boolean
 }
 
-export function TaskItem({ task, hideProject }: TaskItemProps) {
+export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps) {
   const toggleComplete = useTaskStore(s => s.toggleComplete)
   const updateTask = useTaskStore(s => s.updateTask)
   const deleteTask = useTaskStore(s => s.deleteTask)
@@ -51,7 +53,7 @@ export function TaskItem({ task, hideProject }: TaskItemProps) {
 
   /* Toque longo (450ms) entra em modo seleção — apenas touch, tarefas ativas */
   const startLongPress = (e: React.PointerEvent) => {
-    if (!isTouch || selectionMode || task.completed) return
+    if (!isTouch || disableLongPress || selectionMode || task.completed) return
     pressOrigin.current = { x: e.clientX, y: e.clientY }
     longPressTimer.current = setTimeout(() => {
       longPressFired.current = true
