@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
-import { Calendar, Flag, Trash2, FolderOpen, Check, CalendarClock } from 'lucide-react'
+import { Calendar, Flag, Trash2, FolderOpen, Check, CalendarClock, Rows3 } from 'lucide-react'
 import { format, addDays } from 'date-fns'
 import type { Task, Priority } from './types'
 import { useTaskStore } from '../../stores/useTaskStore'
@@ -35,6 +35,7 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
   const updateTask = useTaskStore(s => s.updateTask)
   const deleteTask = useTaskStore(s => s.deleteTask)
   const projects = useTaskStore(s => s.projects)
+  const sections = useTaskStore(s => s.sections)
 
   const expanded = useUiStore(s => s.expandedId === task.id)
   const selected = useUiStore(s => s.selectedId === task.id)
@@ -50,6 +51,21 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pressOrigin = useRef<{ x: number; y: number } | null>(null)
   const longPressFired = useRef(false)
+  const rootRef = useRef<HTMLDivElement>(null)
+
+  /* Clicar fora da tarefa expandida recolhe a edição */
+  useEffect(() => {
+    if (!expanded) return
+    const onPointerDown = (e: PointerEvent) => {
+      const target = e.target as Node
+      if (rootRef.current?.contains(target)) return
+      /* Cliques em modais/popovers (portais no body) não recolhem */
+      if ((target as HTMLElement).closest?.('[role="dialog"]')) return
+      useUiStore.getState().setExpanded(null)
+    }
+    document.addEventListener('pointerdown', onPointerDown)
+    return () => document.removeEventListener('pointerdown', onPointerDown)
+  }, [expanded])
 
   /* Toque longo (450ms) entra em modo seleção — apenas touch, tarefas ativas */
   const startLongPress = (e: React.PointerEvent) => {
@@ -79,6 +95,9 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
   const leftHint = useTransform(x, [-SWIPE_THRESHOLD, 0], [1, 0])
 
   const project = projects.find(p => p.id === task.projectId)
+  const taskSections = task.projectId
+    ? sections.filter(s => s.projectId === task.projectId).sort((a, b) => a.order - b.order)
+    : []
   const due = task.dueDate
   const dueTone = due
     ? isOverdue(due) ? 'text-overdue' : isDueToday(due) ? 'text-today' : 'text-ink-muted'
@@ -103,6 +122,7 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
 
   return (
     <div
+      ref={rootRef}
       className={cn(
         'relative rounded-xl border border-transparent transition-colors',
         expanded && 'border-line bg-surface-elevated shadow-[var(--shadow-md)]',
@@ -230,7 +250,7 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
                   <FolderOpen size={13} />
                   <select
                     value={task.projectId ?? ''}
-                    onChange={e => updateTask(task.id, { projectId: e.target.value || null })}
+                    onChange={e => updateTask(task.id, { projectId: e.target.value || null, sectionId: null })}
                     className="cursor-pointer bg-transparent text-xs text-ink outline-none"
                   >
                     <option value="">Entrada</option>
@@ -239,6 +259,23 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
                     ))}
                   </select>
                 </label>
+
+                {/* Seção — visível quando o projeto tem seções */}
+                {taskSections.length > 0 && (
+                  <label className="flex h-8 items-center gap-1.5 rounded-lg border border-line px-2.5 text-xs text-ink-muted transition-colors hover:border-line-strong">
+                    <Rows3 size={13} />
+                    <select
+                      value={task.sectionId ?? ''}
+                      onChange={e => updateTask(task.id, { sectionId: e.target.value || null })}
+                      className="cursor-pointer bg-transparent text-xs text-ink outline-none"
+                    >
+                      <option value="">Sem seção</option>
+                      {taskSections.map(sec => (
+                        <option key={sec.id} value={sec.id}>{sec.name}</option>
+                      ))}
+                    </select>
+                  </label>
+                )}
 
                 <div className="flex h-8 items-center gap-0.5 rounded-lg border border-line px-1">
                   {([1, 2, 3, 4] as Priority[]).map(p => (

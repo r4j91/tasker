@@ -89,6 +89,8 @@ export function ProjectPage() {
             <MoreHorizontal size={16} />
           </Button>
           {menuOpen && (
+            <>
+            <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
             <div className="absolute right-0 top-full z-20 mt-1 w-44 rounded-lg border border-line bg-surface-elevated py-1 shadow-[var(--shadow-md)]">
               <button
                 onClick={() => { setName(project.name); setEditing(true); setMenuOpen(false) }}
@@ -103,6 +105,7 @@ export function ProjectPage() {
                 <Trash2 size={13} /> Excluir projeto
               </button>
             </div>
+            </>
           )}
         </div>
       </div>
