@@ -12,7 +12,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const base =
   'inline-flex items-center justify-center gap-1.5 font-medium whitespace-nowrap ' +
-  'rounded-lg select-none cursor-pointer transition-colors duration-150 ' +
+  'rounded-lg select-none cursor-pointer transition-[color,background-color,border-color,scale] duration-150 active:scale-[0.96] ' +
   'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ' +
   'disabled:opacity-45 disabled:pointer-events-none ' +
   /* Toque mínimo de 44px no mobile, independente do tamanho visual */

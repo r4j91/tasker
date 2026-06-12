@@ -18,8 +18,8 @@ export function EmptyState({ icon: Icon, title, message }: EmptyStateProps) {
       <div className="mb-4 flex size-14 items-center justify-center rounded-full bg-primary-subtle text-primary-ink">
         <Icon size={24} strokeWidth={1.75} />
       </div>
-      <p className="mb-1 text-[15px] font-semibold">{title}</p>
-      <p className="max-w-60 text-sm text-ink-muted">{message}</p>
+      <p className="mb-1 text-balance text-[15px] font-semibold">{title}</p>
+      <p className="max-w-60 text-pretty text-sm text-ink-muted">{message}</p>
     </motion.div>
   )
 }

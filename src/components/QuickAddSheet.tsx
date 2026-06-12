@@ -232,7 +232,7 @@ export function QuickAddSheet() {
                 onClick={submit}
                 disabled={!title.trim()}
                 aria-label="Adicionar tarefa"
-                whileTap={{ scale: 0.88 }}
+                whileTap={{ scale: 0.95 }}
                 className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full bg-primary-ink text-white transition-opacity disabled:opacity-35 dark:bg-primary dark:text-primary-fg"
               >
                 <ArrowUp size={22} strokeWidth={2.5} />

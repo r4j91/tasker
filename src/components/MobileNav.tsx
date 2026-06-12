@@ -110,7 +110,7 @@ export function MobileNav() {
       <motion.button
         onClick={() => setQuickAddOpen(true)}
         aria-label="Adicionar tarefa"
-        whileTap={{ scale: 0.9 }}
+        whileTap={{ scale: 0.95 }}
         transition={{ type: 'spring', stiffness: 500, damping: 28 }}
         className={cn(
           'absolute -top-7 right-1 z-10 flex size-14 items-center justify-center rounded-full',

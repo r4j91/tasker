@@ -57,7 +57,7 @@ export function SubtaskList({ parentId, header }: SubtaskListProps) {
         <div className="mb-0.5 flex items-baseline gap-2">
           <span className="text-[13px] font-semibold">Sub-tarefas</span>
           {subtasks.length > 0 && (
-            <span className="text-xs text-ink-muted">{done}/{subtasks.length}</span>
+            <span className="text-xs tabular-nums text-ink-muted">{done}/{subtasks.length}</span>
           )}
         </div>
       )}

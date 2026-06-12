@@ -43,7 +43,7 @@ export function Checkbox({ checked, onChange, label, className, disabled, tint, 
         )}
         style={{ borderColor: border, backgroundColor: fill }}
         initial={false}
-        whileTap={{ scale: 0.85 }}
+        whileTap={{ scale: 0.95 }}
         transition={{ duration: 0.16, ease: 'easeOut' }}
       >
         <AnimatePresence>

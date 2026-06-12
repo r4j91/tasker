@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Inbox, CalendarDays, CalendarRange, Plus, Sun, Moon, Search, Tag, SlidersHorizontal } from 'lucide-react'
 import { useTaskStore } from '../stores/useTaskStore'
 import { useUiStore } from '../stores/useUiStore'
@@ -117,9 +118,21 @@ export function AppShell() {
           <button
             onClick={onToggleTheme}
             aria-label="Alternar tema"
-            className="flex size-7 cursor-pointer items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-surface hover:text-ink"
+            className="relative flex size-7 cursor-pointer items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-surface hover:text-ink"
           >
-            {dark ? <Sun size={14} /> : <Moon size={14} />}
+            {/* Crossfade contextual entre os ícones */}
+            <AnimatePresence initial={false} mode="popLayout">
+              <motion.span
+                key={dark ? 'sun' : 'moon'}
+                className="flex"
+                initial={{ opacity: 0, scale: 0.25, filter: 'blur(4px)' }}
+                animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, scale: 0.25, filter: 'blur(4px)' }}
+                transition={{ type: 'spring', duration: 0.3, bounce: 0 }}
+              >
+                {dark ? <Sun size={14} /> : <Moon size={14} />}
+              </motion.span>
+            </AnimatePresence>
           </button>
         </div>
 
@@ -136,12 +149,12 @@ export function AppShell() {
           <NavLink to="/" end className={navItem}>
             <Inbox size={16} />
             Caixa de entrada
-            {inboxCount > 0 && <span className="ml-auto text-xs text-ink-faint">{inboxCount}</span>}
+            {inboxCount > 0 && <span className="ml-auto text-xs tabular-nums text-ink-faint">{inboxCount}</span>}
           </NavLink>
           <NavLink to="/hoje" className={navItem}>
             <CalendarDays size={16} />
             Hoje
-            {todayCount > 0 && <span className="ml-auto text-xs text-ink-faint">{todayCount}</span>}
+            {todayCount > 0 && <span className="ml-auto text-xs tabular-nums text-ink-faint">{todayCount}</span>}
           </NavLink>
           <NavLink to="/em-breve" className={navItem}>
             <CalendarRange size={16} />

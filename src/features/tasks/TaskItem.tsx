@@ -239,7 +239,7 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
               {subtaskTotal > 0 && (
                 <span className="flex items-center gap-1 text-ink-faint">
                   <GitFork size={12} className="rotate-180" />
-                  {subtaskDone}/{subtaskTotal}
+                  <span className="tabular-nums">{subtaskDone}/{subtaskTotal}</span>
                 </span>
               )}
               {due && (

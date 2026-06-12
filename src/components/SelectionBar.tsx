@@ -38,7 +38,7 @@ export function SelectionBar() {
           <div className="mx-auto flex h-14 max-w-md items-center gap-2 rounded-2xl border border-line bg-surface-elevated px-3.5 shadow-[var(--shadow-lg)]">
             <span
               aria-label={`${count} ${count === 1 ? 'tarefa selecionada' : 'tarefas selecionadas'}`}
-              className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary-subtle text-sm font-semibold text-primary-ink"
+              className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary-subtle text-sm font-semibold tabular-nums text-primary-ink"
             >
               {count}
             </span>
