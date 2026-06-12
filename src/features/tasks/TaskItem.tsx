@@ -8,6 +8,7 @@ import { useTaskStore } from '../../stores/useTaskStore'
 import { useUiStore } from '../../stores/useUiStore'
 import { Checkbox } from '../../components/ui/Checkbox'
 import { RollingNumber } from '../../components/ui/RollingNumber'
+import { TaskContextMenu } from './TaskContextMenu'
 import { Button } from '../../components/ui/Button'
 import { Modal } from '../../components/ui/Modal'
 import { dueLabel, dueColorVar, todayISO } from '../../lib/dates'
@@ -67,6 +68,8 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
   const toggleChecked = useUiStore(s => s.toggleChecked)
 
   const [scheduleOpen, setScheduleOpen] = useState(false)
+  /* Menu de contexto (botão direito, desktop) */
+  const [ctxPoint, setCtxPoint] = useState<{ x: number; y: number } | null>(null)
   const [confirmSubtasks, setConfirmSubtasks] = useState(false)
   /* Sub-tarefas aninhadas na lista (estilo Todoist) — expandidas por padrão */
   const [subsOpen, setSubsOpen] = useState(true)
@@ -197,6 +200,12 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
         onPointerUp={cancelLongPress}
         onPointerMove={maybeCancelLongPress}
         onPointerLeave={cancelLongPress}
+        onContextMenu={e => {
+          if (isTouch || task.completed) return
+          e.preventDefault()
+          e.stopPropagation()
+          setCtxPoint({ x: e.clientX, y: e.clientY })
+        }}
         className={cn(
           'relative flex items-start gap-2 px-1 transition-colors',
           'md:hover:bg-surface/50',
@@ -352,6 +361,9 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
           <Button onClick={() => completeWithSubtasks(true)}>Concluir tudo</Button>
         </div>
       </Modal>
+
+      {/* Menu de contexto (botão direito) */}
+      <TaskContextMenu task={task} point={ctxPoint} onClose={() => setCtxPoint(null)} />
 
       {/* Sheet de agendamento (swipe para a esquerda) */}
       <Modal open={scheduleOpen} onClose={() => setScheduleOpen(false)} title="Agendar para">
