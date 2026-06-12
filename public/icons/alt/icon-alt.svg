@@ -1,0 +1,33 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg_0" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#383D46"/><stop offset="1" stop-color="#1C1F25"/>
+    </linearGradient>
+    <radialGradient id="light_0" cx="0.5" cy="0.12" r="0.9">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.20"/>
+      <stop offset="0.55" stop-color="#FFFFFF" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="vig_0" x1="0" y1="0.55" x2="0" y2="1">
+      <stop offset="0" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.22"/>
+    </linearGradient>
+    <linearGradient id="chk_0" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#C2D5F5"/><stop offset="1" stop-color="#8AA5D5"/>
+    </linearGradient>
+    <linearGradient id="rim_0" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.55"/>
+      <stop offset="0.45" stop-color="#FFFFFF" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.45"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="22.5" fill="url(#bg_0)"/>
+  <rect width="100" height="100" rx="22.5" fill="url(#light_0)"/>
+  <rect width="100" height="100" rx="22.5" fill="url(#vig_0)"/>
+  <rect x="0.9" y="0.9" width="98.2" height="98.2" rx="21.8" fill="none" stroke="url(#rim_0)" stroke-width="1.7"/>
+  <path d="M29 58 L45 74 L73 44" stroke="#000000" stroke-opacity="0.10" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M29 58 L45 74 L73 44" stroke="#000000" stroke-opacity="0.16" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M29 54.5 L45 70.5 L73 40.5" stroke="#3A4C75" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M29 48.4 L45 64.4 L73 34.4" stroke="#EDF3FD" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M29 50 L45 66 L73 36" stroke="url(#chk_0)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
