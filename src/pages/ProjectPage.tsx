@@ -72,12 +72,12 @@ export function ProjectPage() {
                 onChange={e => setName(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') saveName(); if (e.key === 'Escape') setEditing(false) }}
                 autoFocus
-                className="display-title border-b border-primary bg-transparent text-[28px] outline-none"
+                className="border-b border-primary bg-transparent text-2xl font-bold tracking-[-0.02em] outline-none"
               />
               <button onClick={saveName} aria-label="Salvar nome" className="cursor-pointer text-done"><Check size={18} /></button>
             </div>
           ) : (
-            <h1 className="display-title truncate text-[32px] md:text-[28px] text-ink">{project.name}</h1>
+            <h1 className="truncate text-[28px] font-bold tracking-[-0.02em] md:text-2xl">{project.name}</h1>
           )}
         </div>
 

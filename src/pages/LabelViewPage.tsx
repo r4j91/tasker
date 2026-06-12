@@ -46,7 +46,7 @@ export function LabelViewPage() {
       <div className="mb-1 flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2.5">
           <Tag size={22} style={{ color: label.color }} fill={`${label.color}40`} />
-          <h1 className="display-title truncate text-[32px] md:text-[28px] text-ink">
+          <h1 className="truncate text-[28px] font-bold tracking-[-0.02em] md:text-2xl">
             {label.name}
           </h1>
         </div>

@@ -291,13 +291,13 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
               {subtaskTotal > 0 && (
                 <span className="flex items-center gap-1 text-ink-faint">
                   <SubtaskIcon />
-                  <span className="data-mono">
+                  <span className="tabular-nums">
                     <RollingNumber value={subtaskDone} />/{subtaskTotal}
                   </span>
                 </span>
               )}
               {due && (
-                <span className="data-mono flex items-center gap-1" style={{ color: dueColorVar(due) }}>
+                <span className="flex items-center gap-1 tabular-nums" style={{ color: dueColorVar(due) }}>
                   <Calendar size={12} />
                   {dueLabel(due)}{task.dueTime && ` ${task.dueTime}`}
                 </span>
