@@ -125,8 +125,9 @@ export function MobileNav() {
       <nav
         className={cn(
           'grid grid-cols-4 items-stretch rounded-full px-1.5 py-1.5',
-          'border border-line/50 bg-surface-elevated/85 backdrop-blur-xl',
-          'shadow-[0_10px_32px_oklch(0.2_0.03_262/0.16),0_2px_10px_oklch(0.2_0.03_262/0.10)]',
+          'border border-line/50 bg-surface-elevated/70 backdrop-blur-[20px] backdrop-saturate-[1.8] dark:bg-surface-elevated/60',
+          'shadow-[inset_0_1px_0_oklch(1_0_0/0.45),0_10px_32px_oklch(0.2_0.03_262/0.16),0_2px_10px_oklch(0.2_0.03_262/0.10)]',
+          'dark:shadow-[inset_0_1px_0_oklch(1_0_0/0.08),0_10px_32px_oklch(0_0_0/0.30),0_2px_10px_oklch(0_0_0/0.20)]',
         )}
       >
         {items.map(item => {
