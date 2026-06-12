@@ -160,7 +160,13 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
   ]
 
   return (
-    <div className="relative border-b border-line">
+    <div
+      className={cn(
+        /* Divisória inset: começa na coluna do conteúdo da linha (Todoist) */
+        'relative after:absolute after:bottom-0 after:right-0 after:h-px after:bg-line',
+        nested ? 'after:left-[62px]' : subtasks.length > 0 ? 'after:left-9' : 'after:left-1',
+      )}
+    >
       {/* Fundos revelados pelo swipe (apenas touch) */}
       {isTouch && (
         <>
@@ -287,7 +293,13 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
                 </span>
               )}
               {taskLabels.map(l => (
-                <span key={l.id} className="flex items-center gap-1 text-ink-muted">
+                <span
+                  key={l.id}
+                  className="flex items-center gap-1"
+                  /* Texto na cor da etiqueta (Todoist); mistura com --ink
+                     garante contraste nos dois temas */
+                  style={{ color: `color-mix(in oklab, ${l.color} 72%, var(--ink))` }}
+                >
                   <Tag size={12} style={{ color: l.color }} fill={`${l.color}40`} />
                   {l.name}
                 </span>
@@ -313,9 +325,7 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="overflow-hidden"
           >
-            <div className="relative border-t border-line [&>div:last-child]:border-b-0">
-              {/* Linha-guia vertical conectando as sub-tarefas à mãe */}
-              <span aria-hidden className="absolute bottom-2 left-[44px] top-2 w-px bg-line" />
+            <div className="relative before:absolute before:left-9 before:right-0 before:top-0 before:h-px before:bg-line [&>div:last-child]:after:hidden">
               {subtasks.map(sub => (
                 <TaskItem key={sub.id} task={sub} hideProject nested disableLongPress={disableLongPress} />
               ))}
