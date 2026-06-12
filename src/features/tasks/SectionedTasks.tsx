@@ -428,10 +428,13 @@ function AddSectionEnd({ projectId }: { projectId: string }) {
   return (
     <button
       onClick={() => setOpen(true)}
-      className="mt-3 flex h-11 w-full cursor-pointer items-center gap-2 rounded-lg px-2 text-sm text-ink-faint transition-colors hover:text-ink-muted md:h-10 md:text-[13px]"
+      className="group/addsec mt-3 flex h-11 w-full cursor-pointer items-center gap-3 md:h-10"
     >
-      <Plus size={14} />
-      Adicionar seção
+      <span className="h-px flex-1 bg-line transition-colors group-hover/addsec:bg-primary/40" />
+      <span className="text-sm font-medium text-ink-faint transition-colors group-hover/addsec:text-primary-ink md:text-[13px]">
+        Adicionar seção
+      </span>
+      <span className="h-px flex-1 bg-line transition-colors group-hover/addsec:bg-primary/40" />
     </button>
   )
 }
