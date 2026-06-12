@@ -284,7 +284,9 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="overflow-hidden"
           >
-            <div className="border-t border-line [&>div:last-child]:border-b-0">
+            <div className="relative border-t border-line [&>div:last-child]:border-b-0">
+              {/* Linha-guia vertical conectando as sub-tarefas à mãe */}
+              <span aria-hidden className="absolute bottom-2 left-[18px] top-2 w-px bg-line md:left-5" />
               {subtasks.map(sub => (
                 <TaskItem key={sub.id} task={sub} hideProject nested disableLongPress={disableLongPress} />
               ))}
