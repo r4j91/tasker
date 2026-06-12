@@ -43,15 +43,12 @@ export function LabelViewPage() {
 
   return (
     <div className="page-wrap pt-8 md:pt-10">
-      <div className="mb-6 flex items-center justify-between gap-3">
+      <div className="mb-1 flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2.5">
           <Tag size={22} style={{ color: label.color }} fill={`${label.color}40`} />
           <h1 className="truncate text-[28px] font-bold tracking-[-0.02em] md:text-2xl">
             {label.name}
           </h1>
-          {filtered.length > 0 && (
-            <span className="text-sm text-ink-faint">{filtered.length}</span>
-          )}
         </div>
 
         <div className="relative">
@@ -83,6 +80,11 @@ export function LabelViewPage() {
           )}
         </div>
       </div>
+
+      <p className="mb-6 min-h-5 text-sm text-ink-muted">
+        {filtered.length > 0 &&
+          (filtered.length === 1 ? '1 tarefa' : `${filtered.length} tarefas`)}
+      </p>
 
       {filtered.length > 0 ? (
         <TaskList tasks={filtered} reorderable={false} />

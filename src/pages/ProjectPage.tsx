@@ -62,7 +62,7 @@ export function ProjectPage() {
 
   return (
     <div className="page-wrap pt-8 md:pt-10">
-      <div className="mb-6 flex items-center justify-between gap-3">
+      <div className="mb-1 flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2.5">
           <span className="size-3 shrink-0 rounded-full" style={{ background: project.color }} />
           {editing ? (
@@ -110,6 +110,11 @@ export function ProjectPage() {
           )}
         </div>
       </div>
+
+      <p className="mb-6 min-h-5 text-sm text-ink-muted">
+        {projectTasks.length > 0 &&
+          (projectTasks.length === 1 ? '1 tarefa' : `${projectTasks.length} tarefas`)}
+      </p>
 
       <QuickAdd projectId={project.id} />
 
