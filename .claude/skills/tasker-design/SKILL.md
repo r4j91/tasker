@@ -55,6 +55,7 @@ expostos ao Tailwind via `@theme inline` (`bg-canvas`, `text-ink-muted`,
 | `--primary-ink` (texto/ícone da marca sobre canvas) | `oklch(0.400 0.085 262)` | `oklch(0.835 0.060 262)` |
 | `--accent` | `oklch(0.860 0.065 60)` | `oklch(0.840 0.065 70)` |
 | `--accent-fg` | `oklch(0.380 0.075 50)` | `oklch(0.300 0.060 60)` |
+| `--accent-strong` (FAB, realces fortes do acento) | `oklch(0.620 0.115 50)` | `oklch(0.660 0.110 55)` |
 
 ### Estado suave (chips, fundos de swipe, ações em massa)
 

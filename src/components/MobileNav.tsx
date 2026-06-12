@@ -114,8 +114,8 @@ export function MobileNav() {
         transition={{ type: 'spring', stiffness: 500, damping: 28 }}
         className={cn(
           'absolute -top-[60px] right-0 z-10 flex size-14 items-center justify-center rounded-full',
-          'bg-primary-ink text-white dark:bg-primary dark:text-primary-fg',
-          'shadow-[0_8px_24px_oklch(0.2_0.05_262/0.35),0_2px_8px_oklch(0.2_0.05_262/0.25)]',
+          'bg-accent-strong text-white dark:bg-accent dark:text-accent-fg',
+          'shadow-[0_8px_24px_oklch(0.25_0.05_50/0.35),0_2px_8px_oklch(0.25_0.05_50/0.25)]',
         )}
       >
         <Plus size={28} strokeWidth={2.75} />
