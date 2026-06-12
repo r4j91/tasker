@@ -148,7 +148,13 @@ export function MobileNav() {
                   transition={{ type: 'spring', stiffness: 450, damping: 35 }}
                 />
               )}
-              <span className="relative z-10">{item.icon}</span>
+              <motion.span
+                className="relative z-10"
+                animate={active ? { scale: [1, 1.12, 1] } : { scale: 1 }}
+                transition={{ duration: 0.3, times: [0, 0.5, 1], ease: 'easeOut' }}
+              >
+                {item.icon}
+              </motion.span>
               <span className="relative z-10 max-w-full truncate px-1 text-xs font-medium leading-tight">
                 {item.label}
               </span>
