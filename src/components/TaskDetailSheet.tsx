@@ -213,7 +213,7 @@ export function TaskDetailSheet() {
                         'flex h-10 cursor-pointer items-center gap-1 rounded-lg px-2.5 text-sm font-semibold transition-colors',
                         task.priority === p ? 'bg-surface' : 'text-ink-faint',
                       )}
-                      style={task.priority === p ? { color: PRIORITY_TINTS[p] } : undefined}
+                      style={task.priority === p ? { color: `var(--priority-${p}-text)` } : undefined}
                     >
                       <Flag
                         size={15}

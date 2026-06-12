@@ -344,9 +344,13 @@ export function TaskDetailModal() {
                   value={
                     <span
                       className={cn('flex items-center gap-1.5', task.priority === 4 && 'text-ink-muted')}
-                      style={task.priority < 4 ? { color: PRIORITY_TINTS[task.priority] } : undefined}
+                      style={task.priority < 4 ? { color: `var(--priority-${task.priority}-text)` } : undefined}
                     >
-                      <Flag size={14} fill={task.priority < 4 ? 'currentColor' : 'none'} />
+                      <Flag
+                        size={14}
+                        fill={task.priority < 4 ? PRIORITY_TINTS[task.priority] : 'none'}
+                        style={task.priority < 4 ? { color: PRIORITY_TINTS[task.priority] } : undefined}
+                      />
                       P{task.priority}
                     </span>
                   }

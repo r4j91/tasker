@@ -14,7 +14,7 @@ interface SmartInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'v
 }
 
 const SEGMENT_STYLE: Record<Exclude<SegmentType, 'label'>, string> = {
-  date:     'bg-today-bg text-today rounded',
+  date:     'bg-today-bg text-(--date-today) rounded',
   time:     'bg-accent/25 text-accent-fg rounded',
   project:  'bg-primary-subtle text-primary-ink rounded',
   priority: 'bg-overdue-bg text-overdue rounded',
@@ -214,9 +214,9 @@ export const SmartInput = forwardRef<HTMLInputElement, SmartInputProps>(
             {parsed.priority < 4 && (
               <span
                 className="flex items-center gap-1"
-                style={{ color: `var(--priority-${parsed.priority})` }}
+                style={{ color: `var(--priority-${parsed.priority}-text)` }}
               >
-                <Flag size={12} fill="currentColor" /> P{parsed.priority}
+                <Flag size={12} fill={`var(--priority-${parsed.priority})`} style={{ color: `var(--priority-${parsed.priority})` }} /> P{parsed.priority}
               </span>
             )}
           </div>

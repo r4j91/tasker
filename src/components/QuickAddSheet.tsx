@@ -165,9 +165,13 @@ export function QuickAddSheet() {
                     'flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 text-[13px] font-medium transition-colors',
                     effPriority < 4 ? '' : 'text-ink-muted',
                   )}
-                  style={effPriority < 4 ? { color: PRIORITY_TINTS[effPriority] } : undefined}
+                  style={effPriority < 4 ? { color: `var(--priority-${effPriority}-text)` } : undefined}
                 >
-                  <Flag size={14} fill={effPriority < 4 ? 'currentColor' : 'none'} />
+                  <Flag
+                    size={14}
+                    fill={effPriority < 4 ? PRIORITY_TINTS[effPriority] : 'none'}
+                    style={effPriority < 4 ? { color: PRIORITY_TINTS[effPriority] } : undefined}
+                  />
                   {effPriority < 4 ? `P${effPriority}` : 'Prioridade'}
                 </button>
                 {prioMenu && (
