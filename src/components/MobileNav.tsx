@@ -96,7 +96,7 @@ export function MobileNav() {
       match: p => p.startsWith('/hoje'),
     },
     {
-      key: 'filtros', label: 'Filtros e etiquetas', icon: <FiltrosIcon />, to: '/filtros',
+      key: 'filtros', label: 'Filtros', icon: <FiltrosIcon />, to: '/filtros',
       match: p => p.startsWith('/filtros'),
     },
   ]
@@ -148,7 +148,7 @@ export function MobileNav() {
                 />
               )}
               <span className="relative z-10">{item.icon}</span>
-              <span className="relative z-10 max-w-full truncate px-1 text-[11px] font-medium leading-tight">
+              <span className="relative z-10 max-w-full truncate px-1 text-xs font-medium leading-tight">
                 {item.label}
               </span>
             </button>
