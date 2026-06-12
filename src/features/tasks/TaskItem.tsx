@@ -138,6 +138,8 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
       className={cn(
         'relative border-b border-line transition-colors',
         'md:hover:bg-surface/60',
+        /* Feedback transitório de toque — só enquanto o dedo pressiona a linha */
+        'has-[[data-row-main]:active]:bg-surface/60',
         selected && 'bg-surface',
       )}
     >
@@ -179,7 +181,12 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
             onClick={() => setSubsOpen(o => !o)}
             aria-expanded={subsOpen}
             aria-label={subsOpen ? 'Recolher sub-tarefas' : 'Expandir sub-tarefas'}
-            className="mt-[9px] flex size-7 shrink-0 -ml-1 cursor-pointer items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-surface hover:text-ink"
+            className={cn(
+              'relative mt-[10px] md:mt-2 flex size-7 shrink-0 -ml-1 cursor-pointer items-center justify-center rounded-md text-ink-faint transition-colors',
+              'active:bg-surface md:hover:bg-surface md:hover:text-ink',
+              /* Área de toque 44px na vertical; à direita para, para não invadir o checkbox */
+              'after:absolute after:-inset-y-2 after:-left-2 after:right-0',
+            )}
           >
             <motion.span
               animate={{ rotate: subsOpen ? 0 : -90 }}
@@ -190,7 +197,8 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
             </motion.span>
           </button>
         )}
-        <span className="mt-[13px] shrink-0">
+        {/* Centro óptico da 1ª linha do título: 24px (mobile, leading-6) / 22px (desktop, leading-5) */}
+        <span className="mt-[15px] md:mt-[13px] shrink-0">
           {selectionMode ? (
             <span
               className={cn(
@@ -220,6 +228,7 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
             if (selectionMode) { toggleChecked(task.id); return }
             setDetailTask(task.id)
           }}
+          data-row-main
           className="flex min-h-12 min-w-0 flex-1 cursor-pointer flex-col justify-center gap-0.5 py-3 text-left"
         >
           <span className={cn('truncate text-base leading-6 md:text-sm md:leading-5', task.completed && 'text-ink-faint line-through')}>
@@ -243,7 +252,7 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
                 </span>
               )}
               {due && (
-                <span className="flex items-center gap-1" style={{ color: dueColorVar(due) }}>
+                <span className="flex items-center gap-1 tabular-nums" style={{ color: dueColorVar(due) }}>
                   <Calendar size={12} />
                   {dueLabel(due)}{task.dueTime && ` ${task.dueTime}`}
                 </span>
