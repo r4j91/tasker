@@ -105,6 +105,8 @@ P4 não tem token próprio: usa os neutros (checkbox com borda
   página desktop), 28px (títulos de página mobile).
 - Inputs no mobile: mínimo 16px (regra global em `index.css`, evita o
   zoom automático do iOS — não rebaixar com utilities).
+- `color-scheme` segue o tema (`:root` light, `.dark` dark) — teclado
+  virtual, scrollbars e controles nativos acompanham.
 - Números dinâmicos (contadores, "1/4"): `tabular-nums`.
 - Pesos: 400 corpo, 500 rótulos/medium, 600-700 títulos.
 
@@ -269,8 +271,8 @@ Garantir contraste legível dos chips nos dois temas.
   com undo). Formato de data idêntico em todas as superfícies.
 
 ### Sub-tarefas
-- Bloco aninhado na lista tem linha-guia vertical de 1px (`--line`)
-  conectando as sub-tarefas à mãe.
+- Na lista, o checkbox da sub-tarefa alinha sob o TÍTULO da mãe
+  (indent de 62px); sem linha-guia vertical.
 - 1 nível de profundidade. Compactas: linhas de 36-40px, checkbox
   ~16px, separador fino, bloco colado à descrição, contador
   "Sub-tarefas 1/4" no topo, alça de arrastar no hover,
@@ -284,7 +286,12 @@ Garantir contraste legível dos chips nos dois temas.
   teclado). Nenhum estado persiste após a interação.
 - Descrição: UMA linha truncada, fonte menor, tom suave.
 - Metadados (sub-tarefas, data, etiquetas) alinhados, ícones do
-  mesmo tamanho, espaçamento uniforme.
+  mesmo tamanho, espaçamento uniforme. Etiquetas com TEXTO na cor da
+  etiqueta: `color-mix(in oklab, cor 72%, var(--ink))` (contraste nos
+  dois temas).
+- Divisórias das linhas são INSET: começam na coluna do conteúdo da
+  própria linha (checkbox), nunca na borda da página; sub-tarefas
+  começam no seu próprio indent (62px).
 - Escala fixa de espaçamentos verticais da tela (header → add task
   → seções → tarefas), idêntica em todas as visões.
 
@@ -298,9 +305,15 @@ Garantir contraste legível dos chips nos dois temas.
 
 ### Seções e projetos
 - Seções recolhíveis com animação suave de altura, contador e menu
-  "..." (renomear, mover, excluir). Tarefas sem seção ficam num
-  grupo no topo sem cabeçalho. Arrastar tarefas entre seções e
-  reordenar seções.
+  "..." (adicionar tarefa, renomear, mover, excluir). Tarefas sem
+  seção ficam num grupo no topo sem cabeçalho. Arrastar tarefas entre
+  seções e reordenar seções (somente desktop; no touch o arraste fica
+  desativado para não disputar com swipe/toque longo).
+- "Adicionar tarefa" existe SÓ no topo da página; criar dentro de uma
+  seção é pelo menu "..." da seção.
+- "Adicionar seção" nunca fica fixo: divisor centralizado entre
+  hairlines revelado no hover (desktop); no mobile não aparece (entra
+  futuramente como opção de menu).
 
 ## Checklist antes de declarar qualquer trabalho de UI concluído
 1. Testado em 1440px, 1024px, 390px e 320px.
