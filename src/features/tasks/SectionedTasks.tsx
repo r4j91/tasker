@@ -13,7 +13,6 @@ import type { Task, Section } from './types'
 import { TaskItem } from './TaskItem'
 import { useTaskStore } from '../../stores/useTaskStore'
 import { useUiStore } from '../../stores/useUiStore'
-import { parseTask } from '../../lib/nlparse'
 import { cn } from '../../lib/cn'
 
 const NO_SECTION = 'none'
@@ -186,13 +185,9 @@ function SectionBlock({ section, tasks, canMoveUp, canMoveDown }: {
   const updateSection = useTaskStore(s => s.updateSection)
   const deleteSection = useTaskStore(s => s.deleteSection)
   const moveSection = useTaskStore(s => s.moveSection)
-  const addTask = useTaskStore(s => s.addTask)
-
   const [menuOpen, setMenuOpen] = useState(false)
   const [renaming, setRenaming] = useState(false)
   const [name, setName] = useState(section.name)
-  const [adding, setAdding] = useState(false)
-  const [newTitle, setNewTitle] = useState('')
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `sec:${section.id}`,
@@ -202,23 +197,6 @@ function SectionBlock({ section, tasks, canMoveUp, canMoveDown }: {
   const saveRename = () => {
     if (name.trim()) updateSection(section.id, { name: name.trim() })
     setRenaming(false)
-  }
-
-  const projects = useTaskStore(s => s.projects)
-
-  const submitTask = () => {
-    const parsed = parseTask(newTitle, projects, useTaskStore.getState().labels)
-    if (!parsed.title.trim()) return
-    addTask({
-      title: parsed.title,
-      dueDate: parsed.dueDate,
-      dueTime: parsed.dueTime,
-      priority: parsed.priority,
-      projectId: section.projectId,
-      sectionId: section.id,
-      labels: parsed.labelIds,
-    })
-    setNewTitle('')
   }
 
   return (
@@ -280,6 +258,11 @@ function SectionBlock({ section, tasks, canMoveUp, canMoveDown }: {
             <>
               <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
               <div className="absolute right-0 top-full z-20 mt-1 w-44 rounded-lg border border-line bg-surface-elevated py-1 shadow-[var(--shadow-md)]">
+                <MenuItem
+                  icon={Plus}
+                  label="Adicionar tarefa"
+                  onClick={() => { useUiStore.getState().openQuickAdd({ projectId: section.projectId, sectionId: section.id }); setMenuOpen(false) }}
+                />
                 <MenuItem icon={Pencil} label="Renomear" onClick={() => { setName(section.name); setRenaming(true); setMenuOpen(false) }} />
                 {canMoveUp && <MenuItem icon={ArrowUp} label="Mover para cima" onClick={() => { moveSection(section.id, -1); setMenuOpen(false) }} />}
                 {canMoveDown && <MenuItem icon={ArrowDown} label="Mover para baixo" onClick={() => { moveSection(section.id, 1); setMenuOpen(false) }} />}
@@ -307,38 +290,6 @@ function SectionBlock({ section, tasks, canMoveUp, canMoveDown }: {
           >
             <div className="pt-1">
               <TaskContainer sectionId={section.id} tasks={tasks} />
-
-              {/* Adicionar tarefa na seção */}
-              {adding ? (
-                <input
-                  value={newTitle}
-                  onChange={e => setNewTitle(e.target.value)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') submitTask()
-                    if (e.key === 'Escape') { setNewTitle(''); setAdding(false) }
-                  }}
-                  onBlur={() => { if (!newTitle.trim()) setAdding(false) }}
-                  autoFocus
-                  placeholder="Nome da tarefa (Enter para adicionar)"
-                  className="mt-1 h-10 w-full rounded-lg border border-primary bg-surface-elevated px-3 text-sm placeholder:text-ink-faint focus:outline-none"
-                />
-              ) : (
-                <button
-                  onClick={() => {
-                    if (window.matchMedia('(max-width: 767px)').matches) {
-                      useUiStore.getState().openQuickAdd({ projectId: section.projectId, sectionId: section.id })
-                    } else {
-                      setAdding(true)
-                    }
-                  }}
-                  className="group flex h-11 w-full cursor-pointer items-center gap-2.5 rounded-lg px-1 text-sm text-ink-faint transition-colors hover:text-ink-muted md:h-10 md:text-[13px]"
-                >
-                  <span className="flex size-[16px] items-center justify-center rounded-full text-primary-ink transition-colors group-hover:bg-primary group-hover:text-primary-fg">
-                    <Plus size={13} />
-                  </span>
-                  Adicionar tarefa
-                </button>
-              )}
             </div>
           </motion.div>
         )}
@@ -428,13 +379,11 @@ function AddSectionEnd({ projectId }: { projectId: string }) {
   return (
     <button
       onClick={() => setOpen(true)}
-      className="group/addsec mt-3 flex h-11 w-full cursor-pointer items-center gap-3 md:h-10"
+      className="group/addsec mt-3 hidden h-10 w-full cursor-pointer items-center gap-3 opacity-0 transition-opacity focus-visible:opacity-100 hover:opacity-100 md:flex"
     >
-      <span className="h-px flex-1 bg-line transition-colors group-hover/addsec:bg-primary/40" />
-      <span className="text-sm font-medium text-ink-faint transition-colors group-hover/addsec:text-primary-ink md:text-[13px]">
-        Adicionar seção
-      </span>
-      <span className="h-px flex-1 bg-line transition-colors group-hover/addsec:bg-primary/40" />
+      <span className="h-px flex-1 bg-primary/40" />
+      <span className="text-[13px] font-medium text-primary-ink">Adicionar seção</span>
+      <span className="h-px flex-1 bg-primary/40" />
     </button>
   )
 }
