@@ -7,6 +7,7 @@ import { useShallow } from 'zustand/react/shallow'
 import { useTaskStore } from '../../stores/useTaskStore'
 import { useUiStore } from '../../stores/useUiStore'
 import { Checkbox } from '../../components/ui/Checkbox'
+import { RollingNumber } from '../../components/ui/RollingNumber'
 import { Button } from '../../components/ui/Button'
 import { Modal } from '../../components/ui/Modal'
 import { dueLabel, dueColorVar, todayISO } from '../../lib/dates'
@@ -259,7 +260,9 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
               {subtaskTotal > 0 && (
                 <span className="flex items-center gap-1 text-ink-faint">
                   <GitFork size={12} className="rotate-180" />
-                  <span className="tabular-nums">{subtaskDone}/{subtaskTotal}</span>
+                  <span className="tabular-nums">
+                    <RollingNumber value={subtaskDone} />/{subtaskTotal}
+                  </span>
                 </span>
               )}
               {due && (

@@ -4,6 +4,7 @@ import { Plus, X, GripVertical } from 'lucide-react'
 import { useTaskStore } from '../../stores/useTaskStore'
 import { useUiStore } from '../../stores/useUiStore'
 import { Checkbox } from '../../components/ui/Checkbox'
+import { RollingNumber } from '../../components/ui/RollingNumber'
 import { playCompleteSound } from '../../lib/sound'
 import { parseTask } from '../../lib/nlparse'
 import { cn } from '../../lib/cn'
@@ -57,7 +58,9 @@ export function SubtaskList({ parentId, header }: SubtaskListProps) {
         <div className="mb-0.5 flex items-baseline gap-2">
           <span className="text-[13px] font-semibold">Sub-tarefas</span>
           {subtasks.length > 0 && (
-            <span className="text-xs tabular-nums text-ink-muted">{done}/{subtasks.length}</span>
+            <span className="text-xs tabular-nums text-ink-muted">
+              <RollingNumber value={done} />/{subtasks.length}
+            </span>
           )}
         </div>
       )}
