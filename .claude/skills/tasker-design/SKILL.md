@@ -196,6 +196,21 @@ Garantir contraste legível dos chips nos dois temas.
 - Animar apenas transform e opacity; nunca top/left/height diretos.
 - Animações sutis e rápidas; nada pode atrasar a interação.
 - Reordenações de lista com framer-motion layout.
+- Concluir tarefa é um momento: o círculo dá um pop (1→1.18→1), o
+  preenchimento irradia do centro, o risco entra com ~80ms de atraso
+  e a linha permanece ~350ms antes de sair da lista (imediato com
+  prefers-reduced-motion).
+- Contadores N/M (sub-tarefas) usam `RollingNumber` — o dígito rola
+  na vertical ao mudar; sempre com tabular-nums.
+- O modal de detalhe desktop nasce do ponto clicado (transform-origin
+  no último pointerdown recente; centro quando aberto por teclado).
+
+### Assinaturas visuais
+- Ícone "Hoje" com o número do dia dinâmico — na tab bar mobile E na
+  sidebar desktop (outline no desktop, preenchido no mobile).
+- Estados vazios: círculo `--primary-subtle` com o ícone da visão e o
+  "sol de pêssego" (`--accent`) espiando atrás, entrada em stagger de
+  60ms (ícone → título → texto). Componente único: `EmptyState`.
 
 ### Dados e interação
 - Atualizações otimistas SEMPRE: a interface muda na hora; o
@@ -228,12 +243,20 @@ Garantir contraste legível dos chips nos dois temas.
   não outline fino.
 - Item ativo: pílula de fundo que DESLIZA entre itens
   (framer-motion layoutId).
-- FAB "+" circular (~56-60px) na cor de acento escura, sobreposto
-  acima da barra à direita, com escala spring ao tocar.
+- FAB "+" circular (~56-60px) na cor de acento escura
+  (`--accent-strong` no claro; `--accent` pastel no escuro), flutuando
+  logo ACIMA da barra à direita (sem cobrir a área de toque do 4º
+  item), com escala spring ao tocar.
+- Rótulos da tab bar: curtos o bastante para nunca truncar em 320px
+  ("Filtros", não "Filtros e etiquetas") e nunca abaixo de 12px.
+- Ícone ativo dá um leve bounce (scale 1→1.12→1, 300ms) quando a
+  pílula desliza até ele.
 - Desktop mantém a sidebar (com paridade: Filtros e Etiquetas
   também existem lá).
 
 ### Detalhe da tarefa
+- Altura do modal desktop: cresce com o conteúdo — mínimo 420px,
+  teto em min(80vh, 640px) com scroll interno.
 - Desktop: modal em DUAS COLUNAS — principal (~65%): breadcrumb do
   projeto, checkbox + título grande editável, descrição em texto
   menor e tom suave (nunca caixa alta, nunca em destaque),
@@ -246,6 +269,8 @@ Garantir contraste legível dos chips nos dois temas.
   com undo). Formato de data idêntico em todas as superfícies.
 
 ### Sub-tarefas
+- Bloco aninhado na lista tem linha-guia vertical de 1px (`--line`)
+  conectando as sub-tarefas à mãe.
 - 1 nível de profundidade. Compactas: linhas de 36-40px, checkbox
   ~16px, separador fino, bloco colado à descrição, contador
   "Sub-tarefas 1/4" no topo, alça de arrastar no hover,
@@ -262,6 +287,14 @@ Garantir contraste legível dos chips nos dois temas.
   mesmo tamanho, espaçamento uniforme.
 - Escala fixa de espaçamentos verticais da tela (header → add task
   → seções → tarefas), idêntica em todas as visões.
+
+### Cabeçalhos de página
+- Toda visão tem subtítulo sob o título (contagem "N tarefas" ou data
+  por extenso no Hoje), oculto quando 0 com altura reservada — o
+  ritmo vertical é idêntico em todas as visões, inclusive projeto e
+  etiqueta.
+- Vocabulário único em todas as superfícies: "Caixa de entrada"
+  (nunca "Entrada"), "Projetos" (nunca "Meus projetos").
 
 ### Seções e projetos
 - Seções recolhíveis com animação suave de altura, contador e menu
