@@ -133,7 +133,7 @@ export function TaskDetailModal() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97, y: 10 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="relative flex h-[80vh] max-h-[640px] w-full max-w-3xl overflow-hidden rounded-2xl border border-line bg-canvas shadow-[var(--shadow-lg)]"
+            className="relative flex min-h-[420px] max-h-[min(80vh,640px)] w-full max-w-3xl overflow-hidden rounded-2xl border border-line bg-canvas shadow-[var(--shadow-lg)]"
           >
             {/* ── Coluna principal ── */}
             <div className="flex min-w-0 flex-1 flex-col">
