@@ -146,23 +146,21 @@
   --color-done:             var(--done);
   --color-done-bg:          var(--done-bg);
 
-  --font-sans:    'Inter Variable', system-ui, sans-serif;
-  --font-display: 'Instrument Serif', Georgia, serif;
-  --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+  --font-sans: 'Inter Variable', system-ui, sans-serif;
 }
 
 /* ─── Tipografia de exibição (Instrument Serif itálico) ─────────────── */
 .display-title {
-  font-family: var(--font-display);
+  font-family: 'Instrument Serif', Georgia, serif;
   font-style: italic;
   font-weight: 400;
   letter-spacing: -0.02em;
-  line-height: 1;
+  line-height: 1.05;
 }
 
 /* Dados temporais (datas, horas, contadores) em mono */
 .data-mono {
-  font-family: var(--font-mono);
+  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
 }
