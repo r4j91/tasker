@@ -198,6 +198,7 @@ export function QuickAddSheet() {
                 <Inbox size={16} />
                 <select
                   value={effProject ?? ''}
+                  aria-label="Projeto"
                   onChange={e => setChipProject(e.target.value || null)}
                   className="max-w-40 cursor-pointer truncate bg-transparent text-sm font-medium text-ink outline-none"
                 >

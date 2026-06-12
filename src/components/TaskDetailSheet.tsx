@@ -9,9 +9,12 @@ import { ptBR } from 'date-fns/locale'
 import { useUiStore } from '../stores/useUiStore'
 import { useTaskStore } from '../stores/useTaskStore'
 import { Checkbox } from './ui/Checkbox'
+import { Popover } from './ui/Popover'
 import { SubtaskList } from '../features/tasks/SubtaskList'
 import { LabelPickerModal } from '../features/labels/LabelPickerModal'
 import { playCompleteSound } from '../lib/sound'
+import { todayISO, dueLabel, dueColorVar } from '../lib/dates'
+import { format as fmtDate, addDays } from 'date-fns'
 import type { Priority } from '../features/tasks/types'
 import { cn } from '../lib/cn'
 
@@ -30,6 +33,15 @@ export function TaskDetailSheet() {
   const sections = useTaskStore(s => s.sections)
   const allLabels = useTaskStore(s => s.labels)
   const [labelsOpen, setLabelsOpen] = useState(false)
+  const [datePop, setDatePop] = useState(false)
+  const [timePop, setTimePop] = useState(false)
+
+  const dueOptions = [
+    { label: 'Hoje', value: todayISO() },
+    { label: 'Amanhã', value: fmtDate(addDays(new Date(), 1), 'yyyy-MM-dd') },
+    { label: 'Próxima semana', value: fmtDate(addDays(new Date(), 7), 'yyyy-MM-dd') },
+    { label: 'Sem data', value: null },
+  ]
   const updateTask = useTaskStore(s => s.updateTask)
   const toggleComplete = useTaskStore(s => s.toggleComplete)
   const completeMany = useTaskStore(s => s.completeMany)
@@ -146,6 +158,7 @@ export function TaskDetailSheet() {
                 <div className="flex flex-wrap items-center gap-1 text-[15px]">
                   <select
                     value={task.projectId ?? ''}
+                    aria-label="Projeto"
                     onChange={e => updateTask(task.id, { projectId: e.target.value || null, sectionId: null })}
                     className="max-w-44 cursor-pointer truncate bg-transparent font-medium outline-none"
                   >
@@ -159,6 +172,7 @@ export function TaskDetailSheet() {
                       <span className="text-ink-faint">/</span>
                       <select
                         value={task.sectionId ?? ''}
+                        aria-label="Seção"
                         onChange={e => updateTask(task.id, { sectionId: e.target.value || null })}
                         className="max-w-40 cursor-pointer truncate bg-transparent font-medium outline-none"
                       >
@@ -175,29 +189,86 @@ export function TaskDetailSheet() {
                 </div>
               </Row>
 
-              {/* Vencimento */}
+              {/* Vencimento — chips com popover (mesmo vocabulário do desktop) */}
               <Row icon={<Calendar size={18} />}>
                 <div className="flex flex-wrap items-center gap-2">
-                  <input
-                    type="date"
-                    lang="pt-BR"
-                    value={task.dueDate ?? ''}
-                    onChange={e => updateTask(task.id, { dueDate: e.target.value || null })}
-                    className={cn(
-                      'cursor-pointer bg-transparent text-[15px] outline-none',
-                      task.dueDate ? 'text-ink' : 'text-ink-faint',
+                  <Popover
+                    open={datePop}
+                    onClose={() => setDatePop(false)}
+                    trigger={ref => (
+                      <button
+                        ref={ref}
+                        onClick={() => setDatePop(o => !o)}
+                        className={cn(
+                          'flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 text-[15px] transition-colors',
+                          !task.dueDate && 'text-ink-muted',
+                        )}
+                        style={task.dueDate ? { color: dueColorVar(task.dueDate) } : undefined}
+                      >
+                        {task.dueDate ? dueLabel(task.dueDate) : 'Adicionar data'}
+                      </button>
                     )}
-                  />
-                  <span className="flex items-center gap-1 text-ink-faint">
-                    <CalendarClock size={15} />
-                    <input
-                      type="time"
-                      lang="pt-BR"
-                      value={task.dueTime ?? ''}
-                      onChange={e => updateTask(task.id, { dueTime: e.target.value || null })}
-                      className="cursor-pointer bg-transparent text-[15px] text-ink outline-none"
-                    />
-                  </span>
+                  >
+                    {dueOptions.map(opt => (
+                      <button
+                        key={opt.label}
+                        onClick={() => { updateTask(task.id, { dueDate: opt.value }); setDatePop(false) }}
+                        className="flex min-h-11 w-full cursor-pointer items-center gap-2.5 px-3 text-left text-sm hover:bg-surface"
+                      >
+                        {opt.label}
+                        {task.dueDate === opt.value && <Check size={14} className="ml-auto text-primary-ink" />}
+                      </button>
+                    ))}
+                    <label className="flex min-h-11 items-center gap-2 border-t border-line px-3 text-xs text-ink-muted">
+                      <Calendar size={13} />
+                      <input
+                        type="date"
+                        lang="pt-BR"
+                        aria-label="Data de vencimento"
+                        value={task.dueDate ?? ''}
+                        onChange={e => updateTask(task.id, { dueDate: e.target.value || null })}
+                        className="cursor-pointer bg-transparent text-sm text-ink outline-none"
+                      />
+                    </label>
+                  </Popover>
+
+                  <Popover
+                    open={timePop}
+                    onClose={() => setTimePop(false)}
+                    trigger={ref => (
+                      <button
+                        ref={ref}
+                        onClick={() => setTimePop(o => !o)}
+                        className={cn(
+                          'flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 text-[15px] transition-colors',
+                          task.dueTime ? 'text-ink' : 'text-ink-muted',
+                        )}
+                      >
+                        <CalendarClock size={15} />
+                        {task.dueTime ?? 'Hora'}
+                      </button>
+                    )}
+                  >
+                    <label className="flex min-h-11 items-center gap-2 px-3 text-xs text-ink-muted">
+                      <CalendarClock size={13} />
+                      <input
+                        type="time"
+                        lang="pt-BR"
+                        aria-label="Hora"
+                        value={task.dueTime ?? ''}
+                        onChange={e => updateTask(task.id, { dueTime: e.target.value || null })}
+                        className="cursor-pointer bg-transparent text-sm text-ink outline-none"
+                      />
+                    </label>
+                    {task.dueTime && (
+                      <button
+                        onClick={() => { updateTask(task.id, { dueTime: null }); setTimePop(false) }}
+                        className="flex min-h-11 w-full cursor-pointer items-center px-3 text-left text-sm text-overdue hover:bg-overdue-bg"
+                      >
+                        Remover hora
+                      </button>
+                    )}
+                  </Popover>
                 </div>
               </Row>
 
