@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { motion, AnimatePresence, useMotionValue, useTransform, useReducedMotion } from 'framer-motion'
-import { Calendar, Check, CalendarClock, ChevronDown, Tag } from 'lucide-react'
+import { Calendar, Check, CalendarClock, ChevronDown } from 'lucide-react'
 import { format, addDays } from 'date-fns'
 import type { Task, Priority } from './types'
 import { useShallow } from 'zustand/react/shallow'
@@ -24,16 +24,22 @@ const PRIORITY_META: Record<Priority, { label: string; tint?: string }> = {
 
 const isTouch = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
 
-/* Ícone de sub-tarefas estilo Todoist: nó-mãe ramificando para o filho */
-function SubtaskIcon({ size = 12 }: { size?: number }) {
+/* Ícone de sub-tarefas: bifurcação limpa legível em tamanhos pequenos */
+function SubtaskIcon({ size = 14 }: { size?: number }) {
   return (
     <svg
-      width={size} height={size} viewBox="0 0 16 16" fill="none"
-      stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden
+      width={size} height={size} viewBox="0 0 14 14" fill="none"
+      stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden
     >
-      <circle cx="4.5" cy="4" r="2.3" />
-      <path d="M4.5 6.3V9a3 3 0 0 0 3 3h1.2" />
-      <circle cx="11" cy="12" r="2.3" />
+      {/* Haste vertical */}
+      <line x1="3.5" y1="2" x2="3.5" y2="9" />
+      {/* Ramo superior */}
+      <path d="M3.5 5h3.5" />
+      {/* Ramo inferior com curva */}
+      <path d="M3.5 9h3.5" />
+      {/* Pontinhos nas pontas */}
+      <circle cx="9" cy="5" r="1.1" fill="currentColor" stroke="none" />
+      <circle cx="9" cy="9" r="1.1" fill="currentColor" stroke="none" />
     </svg>
   )
 }
@@ -167,7 +173,9 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
       className={cn(
         /* Divisória inset: começa na coluna do conteúdo da linha (Todoist) */
         'relative after:absolute after:bottom-0 after:right-0 after:h-px after:bg-line',
-        nested ? 'after:left-[62px]' : subtasks.length > 0 ? 'after:left-9' : 'after:left-1',
+        nested
+          ? 'after:left-[62px] before:absolute before:left-[36px] before:top-[22px] before:h-px before:w-[26px] before:bg-line-strong before:opacity-60'
+          : subtasks.length > 0 ? 'after:left-9' : 'after:left-1',
         /* Borda sempre presente (transparent sem projeto) para alinhar todas as linhas */
         !nested && 'transition-[border-left-color] duration-200',
       )}
@@ -308,12 +316,9 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
               {taskLabels.map(l => (
                 <span
                   key={l.id}
-                  className="flex items-center gap-1"
-                  /* Texto na cor da etiqueta (Todoist); mistura com --ink
-                     garante contraste nos dois temas */
-                  style={{ color: `color-mix(in oklab, ${l.color} 72%, var(--ink))` }}
+                  className="inline-flex items-center rounded-[4px] border px-[5px] py-[1px] text-[11px] font-medium leading-4"
+                  style={{ borderColor: l.color, color: l.color }}
                 >
-                  <Tag size={12} style={{ color: l.color }} fill={`${l.color}40`} />
                   {l.name}
                 </span>
               ))}
@@ -338,7 +343,9 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="overflow-hidden"
           >
-            <div className="relative before:absolute before:left-9 before:right-0 before:top-0 before:h-px before:bg-line [&>div:last-child]:after:hidden">
+            <div className="relative [&>div:last-child]:after:hidden">
+              {/* Linha vertical da ramificação — alinhada ao checkbox do pai */}
+              <div className="pointer-events-none absolute bottom-5 left-[36px] top-0 w-px bg-line-strong opacity-60" aria-hidden />
               {subtasks.map(sub => (
                 <TaskItem key={sub.id} task={sub} hideProject nested disableLongPress={disableLongPress} />
               ))}

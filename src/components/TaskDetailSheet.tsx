@@ -311,10 +311,9 @@ export function TaskDetailSheet() {
                       return (
                         <span
                           key={id}
-                          className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[13px] font-medium text-ink"
-                          style={{ backgroundColor: `${l.color}2E` }}
+                          className="inline-flex items-center rounded-[4px] border px-[5px] py-[1px] text-[11px] font-medium leading-4"
+                          style={{ borderColor: l.color, color: l.color }}
                         >
-                          <span className="size-2 rounded-full" style={{ background: l.color }} />
                           {l.name}
                         </span>
                       )

@@ -397,10 +397,13 @@ export function TaskDetailModal() {
                   wide
                   value={
                     taskLabels.length > 0 ? (
-                      <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                      <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
                         {taskLabels.map(l => (
-                          <span key={l.id} className="flex items-center gap-1">
-                            <span className="size-2 rounded-full" style={{ background: l.color }} />
+                          <span
+                            key={l.id}
+                            className="inline-flex items-center rounded-[4px] border px-[5px] py-[1px] text-[11px] font-medium leading-4"
+                            style={{ borderColor: l.color, color: l.color }}
+                          >
                             {l.name}
                           </span>
                         ))}
