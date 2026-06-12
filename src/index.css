@@ -5,6 +5,9 @@
 
 /* ─── Design tokens — paleta pastel ─────────────────────────────────── */
 :root {
+  /* Teclado virtual, scrollbars e controles nativos seguem o tema */
+  color-scheme: light;
+
   /* Superfícies */
   --canvas:            oklch(0.988 0.004 250);
   --surface:           oklch(0.962 0.006 250);
@@ -62,6 +65,8 @@
 }
 
 .dark {
+  color-scheme: dark;
+
   /* Superfícies — cinza médio, não preto */
   --canvas:            oklch(0.285 0.008 262);
   --surface:           oklch(0.325 0.009 262);

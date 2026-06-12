@@ -100,7 +100,7 @@ export function QuickAddSheet() {
       {open && (
         <div className="fixed inset-0 z-50 flex flex-col justify-end">
           <motion.div
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 bg-black/35 dark:bg-black/50"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
             onClick={close}
@@ -110,7 +110,7 @@ export function QuickAddSheet() {
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', stiffness: 420, damping: 40 }}
-            className="relative rounded-t-2xl bg-surface-elevated/90 backdrop-blur-[20px] backdrop-saturate-[1.8] px-4 pt-4 shadow-[inset_0_1px_0_oklch(1_0_0/0.45),var(--shadow-lg)] dark:shadow-[inset_0_1px_0_oklch(1_0_0/0.08),var(--shadow-lg)]"
+            className="relative rounded-t-2xl border-t border-line/60 bg-surface-elevated/95 px-4 pt-4 backdrop-blur-[20px] backdrop-saturate-[1.8] shadow-[inset_0_1px_0_oklch(1_0_0/0.45),var(--shadow-lg)] dark:shadow-[inset_0_1px_0_oklch(1_0_0/0.08),var(--shadow-lg)]"
             style={{
               paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)',
               /* Sobe junto com o teclado virtual (iOS/Android) */
