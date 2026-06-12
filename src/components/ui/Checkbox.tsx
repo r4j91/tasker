@@ -15,11 +15,6 @@ interface CheckboxProps {
 
 export function Checkbox({ checked, onChange, label, className, disabled, tint, small }: CheckboxProps) {
   const border = checked || tint ? (tint ?? 'var(--primary)') : 'var(--line-strong)'
-  const fill = checked
-    ? (tint ?? 'var(--primary)')
-    : tint
-      ? `color-mix(in oklab, ${tint} 14%, transparent)`
-      : 'transparent'
   return (
     <button
       type="button"
@@ -41,11 +36,26 @@ export function Checkbox({ checked, onChange, label, className, disabled, tint, 
           'relative shrink-0 rounded-full border-2 transition-colors duration-150',
           small ? 'size-[15px]' : 'size-[18px]',
         )}
-        style={{ borderColor: border, backgroundColor: fill }}
+        style={{
+          borderColor: border,
+          backgroundColor: !checked && tint
+            ? `color-mix(in oklab, ${tint} 14%, transparent)`
+            : 'transparent',
+        }}
         initial={false}
-        whileTap={{ scale: 0.95 }}
-        transition={{ duration: 0.16, ease: 'easeOut' }}
+        animate={checked ? { scale: [1, 1.18, 1] } : { scale: 1 }}
+        whileTap={{ scale: 0.92 }}
+        transition={{ duration: 0.3, times: [0, 0.4, 1], ease: 'easeOut' }}
       >
+        {/* Preenchimento irradiando do centro ao concluir */}
+        <motion.span
+          aria-hidden
+          className="absolute -inset-0.5 rounded-full"
+          style={{ backgroundColor: tint ?? 'var(--primary)' }}
+          initial={false}
+          animate={checked ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
+          transition={{ duration: 0.18, ease: 'easeOut' }}
+        />
         <AnimatePresence>
           {checked && (
             <motion.svg
@@ -87,7 +97,7 @@ export function Checkbox({ checked, onChange, label, className, disabled, tint, 
             className="absolute left-0 top-1/2 h-px w-full bg-ink-faint origin-left"
             initial={false}
             animate={{ scaleX: checked ? 1 : 0 }}
-            transition={{ duration: 0.22, ease: 'easeOut' }}
+            transition={{ duration: 0.22, ease: 'easeOut', delay: checked ? 0.08 : 0 }}
           />
         </span>
       )}

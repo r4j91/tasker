@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
+import { motion, AnimatePresence, useMotionValue, useTransform, useReducedMotion } from 'framer-motion'
 import { Calendar, Check, CalendarClock, ChevronDown, GitFork, Tag } from 'lucide-react'
 import { format, addDays } from 'date-fns'
 import type { Task, Priority } from './types'
@@ -98,13 +98,24 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
   const project = projects.find(p => p.id === task.projectId)
   const due = task.dueDate
 
+  /* Conclusão otimista local: o check anima antes de a linha sair da lista */
+  const [justCompleted, setJustCompleted] = useState(false)
+  const reducedMotion = useReducedMotion()
+
   const complete = () => {
     /* Concluir a mãe com sub-tarefas pendentes pergunta antes */
     if (!task.completed && subtaskTotal - subtaskDone > 0) {
       setConfirmSubtasks(true)
       return
     }
-    if (!task.completed && soundEnabled) playCompleteSound()
+    if (!task.completed) {
+      if (justCompleted) return
+      if (soundEnabled) playCompleteSound()
+      if (reducedMotion) { toggleComplete(task.id); return }
+      setJustCompleted(true)
+      setTimeout(() => { toggleComplete(task.id); setJustCompleted(false) }, 350)
+      return
+    }
     toggleComplete(task.id)
   }
 
@@ -213,7 +224,7 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
             </span>
           ) : (
             <Checkbox
-              checked={task.completed}
+              checked={task.completed || justCompleted}
               onChange={complete}
               tint={PRIORITY_META[task.priority].tint}
               /* Toque de 44px com visual de 18px */
@@ -231,7 +242,7 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
           data-row-main
           className="flex min-h-12 min-w-0 flex-1 cursor-pointer flex-col justify-center gap-0.5 py-3 text-left"
         >
-          <span className={cn('truncate text-base leading-6 md:text-sm md:leading-5', task.completed && 'text-ink-faint line-through')}>
+          <span className={cn('truncate text-base leading-6 transition-colors duration-200 md:text-sm md:leading-5', (task.completed || justCompleted) && 'text-ink-faint line-through')}>
             {task.title}
           </span>
 
