@@ -60,7 +60,7 @@ export function QuickAdd({ projectId = null, dueDate = null }: QuickAddProps) {
   }
 
   return (
-    <div className="mb-4">
+    <div className="mb-2">
       <AnimatePresence initial={false} mode="popLayout">
         {open ? (
           <motion.div

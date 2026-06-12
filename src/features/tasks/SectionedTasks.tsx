@@ -141,7 +141,7 @@ function TaskContainer({ sectionId, tasks }: { sectionId: string | null; tasks: 
       <div
         ref={setNodeRef}
         className={cn(
-          'min-h-2 rounded-xl transition-colors',
+          'min-h-0 rounded-xl transition-colors',
           isOver && tasks.length === 0 && 'bg-primary-subtle/50',
         )}
       >
@@ -222,7 +222,7 @@ function SectionBlock({ section, tasks, canMoveUp, canMoveDown }: {
     <section
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={cn('mt-5', isDragging && 'opacity-40')}
+      className={cn('mt-3', isDragging && 'opacity-40')}
     >
       {/* Cabeçalho */}
       <div className="group/header flex min-h-11 items-center gap-1 border-b border-line pb-1">
@@ -402,7 +402,7 @@ function AddSectionDivider({ projectId, index }: { projectId: string; index: num
   if (open) return <>{input}</>
 
   return (
-    <div className="group/divider relative hidden h-4 items-center md:flex" data-divider={index}>
+    <div className="group/divider relative hidden h-3 items-center md:flex" data-divider={index}>
       <button
         onClick={() => setOpen(true)}
         className="absolute inset-x-0 flex cursor-pointer items-center gap-2 opacity-0 transition-opacity focus-visible:opacity-100 group-hover/divider:opacity-100"
@@ -424,7 +424,7 @@ function AddSectionEnd({ projectId }: { projectId: string }) {
   return (
     <button
       onClick={() => setOpen(true)}
-      className="mt-5 flex h-11 w-full cursor-pointer items-center gap-2 rounded-lg px-2 text-sm text-ink-faint transition-colors hover:text-ink-muted md:h-10 md:text-[13px]"
+      className="mt-3 flex h-11 w-full cursor-pointer items-center gap-2 rounded-lg px-2 text-sm text-ink-faint transition-colors hover:text-ink-muted md:h-10 md:text-[13px]"
     >
       <Plus size={14} />
       Adicionar seção

@@ -44,7 +44,6 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
   const subtaskDone = useTaskStore(s => s.tasks.reduce((n, t) => (t.parentId === task.id && t.completed ? n + 1 : n), 0))
 
   const selected = useUiStore(s => s.selectedId === task.id)
-  const setSelected = useUiStore(s => s.setSelected)
   const setDetailTask = useUiStore(s => s.setDetailTask)
   const soundEnabled = useUiStore(s => s.soundEnabled)
   const selectionMode = useUiStore(s => s.selectionMode)
@@ -141,6 +140,7 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
     <div
       className={cn(
         'relative border-b border-line transition-colors',
+        'md:hover:bg-surface/60',
         selected && 'bg-surface',
       )}
     >
@@ -220,7 +220,6 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
             /* Ignora o clique gerado ao soltar o dedo do toque longo */
             if (longPressFired.current) { longPressFired.current = false; return }
             if (selectionMode) { toggleChecked(task.id); return }
-            setSelected(task.id)
             setDetailTask(task.id)
           }}
           className="flex min-h-12 min-w-0 flex-1 cursor-pointer flex-col justify-center gap-0.5 py-3 text-left"
@@ -241,7 +240,7 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
             <span className="flex w-full flex-wrap items-center gap-2 text-[13px] md:text-xs">
               {subtaskTotal > 0 && (
                 <span className="flex items-center gap-1 text-ink-faint">
-                  <GitFork size={11} className="rotate-180" />
+                  <GitFork size={12} className="rotate-180" />
                   {subtaskDone}/{subtaskTotal}
                 </span>
               )}
@@ -253,7 +252,7 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
               )}
               {taskLabels.map(l => (
                 <span key={l.id} className="flex items-center gap-1 text-ink-muted">
-                  <Tag size={11} style={{ color: l.color }} fill={`${l.color}40`} />
+                  <Tag size={12} style={{ color: l.color }} fill={`${l.color}40`} />
                   {l.name}
                 </span>
               ))}
