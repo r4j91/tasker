@@ -256,8 +256,7 @@ export function TaskDetailSheet() {
 
               {/* Sub-tarefas */}
               <div className="pt-4">
-                <p className="mb-1 text-[15px] font-semibold">Subtarefas</p>
-                <SubtaskList parentId={task.id} />
+                <SubtaskList parentId={task.id} header />
               </div>
 
               {/* Rodapé */}

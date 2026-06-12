@@ -181,7 +181,7 @@ export function TaskDetailModal() {
 
                 {/* Sub-tarefas */}
                 <div className="mt-4 pl-[34px]">
-                  <SubtaskList parentId={task.id} />
+                  <SubtaskList parentId={task.id} header />
                 </div>
               </div>
             </div>

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Reorder, AnimatePresence, motion } from 'framer-motion'
-import { Plus, X } from 'lucide-react'
+import { Plus, X, GripVertical } from 'lucide-react'
 import { useTaskStore } from '../../stores/useTaskStore'
 import { useUiStore } from '../../stores/useUiStore'
 import { Checkbox } from '../../components/ui/Checkbox'
@@ -10,10 +10,12 @@ import { cn } from '../../lib/cn'
 
 interface SubtaskListProps {
   parentId: string
+  /** Cabeçalho "Sub-tarefas N/M" no topo do bloco */
+  header?: boolean
 }
 
-/** Sub-tarefas dentro da visão expandida — 1 nível, estilo Things 3. */
-export function SubtaskList({ parentId }: SubtaskListProps) {
+/** Bloco compacto de sub-tarefas — padrão Todoist. */
+export function SubtaskList({ parentId, header }: SubtaskListProps) {
   const tasks = useTaskStore(s => s.tasks)
   const addTask = useTaskStore(s => s.addTask)
   const toggleComplete = useTaskStore(s => s.toggleComplete)
@@ -27,6 +29,7 @@ export function SubtaskList({ parentId }: SubtaskListProps) {
   const subtasks = tasks
     .filter(t => t.parentId === parentId)
     .sort((a, b) => a.order - b.order)
+  const done = subtasks.filter(t => t.completed).length
 
   const submit = () => {
     const { projects, labels } = useTaskStore.getState()
@@ -50,6 +53,15 @@ export function SubtaskList({ parentId }: SubtaskListProps) {
 
   return (
     <div>
+      {header && (
+        <div className="mb-0.5 flex items-baseline gap-2">
+          <span className="text-[13px] font-semibold">Sub-tarefas</span>
+          {subtasks.length > 0 && (
+            <span className="text-xs text-ink-muted">{done}/{subtasks.length}</span>
+          )}
+        </div>
+      )}
+
       {subtasks.length > 0 && (
         <Reorder.Group
           axis="y"
@@ -68,18 +80,22 @@ export function SubtaskList({ parentId }: SubtaskListProps) {
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.15, ease: 'easeOut' }}
                 whileDrag={{ scale: 1.01, backgroundColor: 'var(--surface)' }}
-                className="group/sub relative rounded-lg"
+                className="group/sub relative rounded-md"
               >
-                <div className="flex items-center gap-2.5 border-b border-line/60 py-1 pl-1 pr-0.5">
+                <div className="flex min-h-9 items-center gap-2 border-b border-line/60 pr-0.5">
+                  {/* Alça de arrastar — aparece no hover */}
+                  <span className="flex w-4 shrink-0 cursor-grab items-center justify-center text-ink-faint opacity-0 transition-opacity group-hover/sub:opacity-100 max-md:hidden">
+                    <GripVertical size={12} />
+                  </span>
                   <Checkbox
                     checked={sub.completed}
                     onChange={() => complete(sub.id, sub.completed)}
                     small
-                    className="relative z-10 -m-3 w-auto min-h-0 p-3"
+                    className="relative z-10 -m-3 w-auto min-h-0 p-3 max-md:ml-0"
                   />
                   <span
                     className={cn(
-                      'min-h-9 flex-1 truncate py-2 text-sm leading-5 md:text-[13px]',
+                      'flex-1 truncate py-1.5 text-sm leading-5 md:text-[13px]',
                       sub.completed && 'text-ink-faint line-through',
                     )}
                   >
@@ -88,7 +104,7 @@ export function SubtaskList({ parentId }: SubtaskListProps) {
                   <button
                     onClick={() => deleteTask(sub.id)}
                     aria-label={`Excluir sub-tarefa ${sub.title}`}
-                    className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-md text-ink-faint opacity-100 transition-opacity hover:bg-surface hover:text-overdue md:size-7 md:opacity-0 md:group-hover/sub:opacity-100"
+                    className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-ink-faint opacity-100 transition-opacity hover:bg-surface hover:text-overdue md:size-6 md:opacity-0 md:group-hover/sub:opacity-100"
                   >
                     <X size={13} />
                   </button>
@@ -99,7 +115,7 @@ export function SubtaskList({ parentId }: SubtaskListProps) {
         </Reorder.Group>
       )}
 
-      {/* Adicionar sub-tarefa */}
+      {/* Adicionar sub-tarefa — linha discreta colada ao bloco */}
       {adding ? (
         <motion.input
           initial={{ opacity: 0 }}
@@ -113,12 +129,12 @@ export function SubtaskList({ parentId }: SubtaskListProps) {
           onBlur={() => { if (!title.trim()) setAdding(false) }}
           autoFocus
           placeholder="Sub-tarefa (Enter para adicionar)"
-          className="mt-1 h-10 w-full rounded-lg border border-primary bg-canvas px-3 text-sm placeholder:text-ink-faint focus:outline-none md:h-9 md:text-[13px]"
+          className="h-9 w-full rounded-md border border-primary bg-canvas px-2.5 text-sm placeholder:text-ink-faint focus:outline-none md:h-8 md:text-[13px]"
         />
       ) : (
         <button
           onClick={() => setAdding(true)}
-          className="flex min-h-10 cursor-pointer items-center gap-2 rounded-lg px-1 text-sm text-ink-faint transition-colors hover:text-ink-muted md:min-h-8 md:text-[13px]"
+          className="flex min-h-9 cursor-pointer items-center gap-2 rounded-md pl-4 pr-1 text-sm text-ink-muted transition-colors hover:text-ink md:min-h-8 md:text-[13px] max-md:pl-0"
         >
           <Plus size={13} />
           Adicionar sub-tarefa
