@@ -68,7 +68,7 @@ export function BrowsePage() {
       {/* Projetos */}
       <div className="mb-1 mt-7 flex items-center justify-between px-1">
         <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-ink-faint">
-          Meus projetos
+          Projetos
         </span>
         <button
           onClick={() => setOpen(true)}
