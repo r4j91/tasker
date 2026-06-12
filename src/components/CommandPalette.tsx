@@ -81,7 +81,7 @@ function PaletteContent({ onClose }: { onClose: () => void }) {
       { id: 'go-inbox',    icon: Inbox,         label: 'Ir para Caixa de entrada', hint: 'Navegar', run: () => { navigate('/'); onClose() } },
       { id: 'go-today',    icon: CalendarDays,  label: 'Ir para Hoje',             hint: 'Navegar', run: () => { navigate('/hoje'); onClose() } },
       { id: 'go-upcoming', icon: CalendarRange, label: 'Ir para Em breve',         hint: 'Navegar', run: () => { navigate('/em-breve'); onClose() } },
-      { id: 'go-projects', icon: FolderOpen,    label: 'Ver projetos',             hint: 'Navegar', run: () => { navigate('/projetos'); onClose() } },
+      { id: 'go-projects', icon: FolderOpen,    label: 'Navegar (projetos e mais)', hint: 'Navegar', run: () => { navigate('/navegar'); onClose() } },
       { id: 'theme',       icon: Moon,          label: 'Alternar tema claro/escuro', hint: 'Ação',  run: () => { onToggleTheme(); onClose() } },
       {
         id: 'sound', icon: soundEnabled ? VolumeX : Volume2,

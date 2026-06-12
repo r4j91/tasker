@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { Inbox, CalendarDays, CalendarRange, Plus, Sun, Moon, Search, Tag } from 'lucide-react'
+import { Inbox, CalendarDays, CalendarRange, Plus, Sun, Moon, Search, Tag, SlidersHorizontal } from 'lucide-react'
 import { useTaskStore } from '../stores/useTaskStore'
 import { useUiStore } from '../stores/useUiStore'
 import { PROJECT_COLORS, type Priority } from '../features/tasks/types'
@@ -146,6 +146,10 @@ export function AppShell() {
           <NavLink to="/em-breve" className={navItem}>
             <CalendarRange size={16} />
             Em breve
+          </NavLink>
+          <NavLink to="/filtros" className={navItem}>
+            <SlidersHorizontal size={16} />
+            Filtros e etiquetas
           </NavLink>
         </nav>
 
