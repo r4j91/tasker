@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Inbox, CalendarDays, CalendarRange, Plus, Sun, Moon, Search, Tag, SlidersHorizontal } from 'lucide-react'
+import { Inbox, CalendarRange, Plus, Sun, Moon, Search, Tag, SlidersHorizontal } from 'lucide-react'
 import { useTaskStore } from '../stores/useTaskStore'
 import { useUiStore } from '../stores/useUiStore'
 import { PROJECT_COLORS, type Priority } from '../features/tasks/types'
@@ -22,6 +22,29 @@ import { useMediaQuery } from '../lib/useMediaQuery'
 import { LabelEditModal } from '../features/labels/LabelEditModal'
 import { cn } from '../lib/cn'
 
+
+/* Calendário com o dia atual — assinatura do TASKER, par do ícone da
+   tab bar mobile (traço outline para casar com os demais da sidebar). */
+function TodayIcon() {
+  const day = new Date().getDate()
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+      <rect x="3" y="4" width="18" height="18" rx="3" />
+      <path d="M3 9h18" />
+      <text
+        x="12" y="18.5"
+        textAnchor="middle"
+        fontSize="9.5"
+        fontWeight="600"
+        fontFamily="'Inter Variable', system-ui, sans-serif"
+        fill="currentColor"
+        stroke="none"
+      >
+        {day}
+      </text>
+    </svg>
+  )
+}
 
 const navItem = ({ isActive }: { isActive: boolean }) =>
   cn(
@@ -152,7 +175,7 @@ export function AppShell() {
             {inboxCount > 0 && <span className="ml-auto text-xs tabular-nums text-ink-faint">{inboxCount}</span>}
           </NavLink>
           <NavLink to="/hoje" className={navItem}>
-            <CalendarDays size={16} />
+            <TodayIcon />
             Hoje
             {todayCount > 0 && <span className="ml-auto text-xs tabular-nums text-ink-faint">{todayCount}</span>}
           </NavLink>
