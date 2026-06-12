@@ -66,6 +66,7 @@ export function QuickAddSheet() {
       projectId: p.projectId ?? (chipProject !== undefined ? chipProject : ctxProject),
       sectionId: p.projectId || chipProject !== undefined ? null : ctxSection,
       priority: p.priority < 4 ? p.priority : (chipPriority ?? 4),
+      labels: p.labelIds,
     })
     /* Notas entram na tarefa recém-criada */
     if (notes.trim()) {

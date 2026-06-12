@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { Inbox, CalendarDays, CalendarRange, Plus, Sun, Moon, Search } from 'lucide-react'
+import { Inbox, CalendarDays, CalendarRange, Plus, Sun, Moon, Search, Tag } from 'lucide-react'
 import { useTaskStore } from '../stores/useTaskStore'
 import { useUiStore } from '../stores/useUiStore'
 import { PROJECT_COLORS, type Priority } from '../features/tasks/types'
@@ -16,6 +16,7 @@ import { ShortcutsModal } from './ShortcutsModal'
 import { MobileNav } from './MobileNav'
 import { QuickAddSheet } from './QuickAddSheet'
 import { TaskDetailSheet } from './TaskDetailSheet'
+import { LabelEditModal } from '../features/labels/LabelEditModal'
 import { cn } from '../lib/cn'
 
 
@@ -31,11 +32,13 @@ export function AppShell() {
   const dark = useUiStore(s => s.dark)
   const onToggleTheme = useUiStore(s => s.toggleDark)
   const projects = useTaskStore(s => s.projects)
+  const labels = useTaskStore(s => s.labels)
   const tasks = useTaskStore(s => s.tasks)
   const addProject = useTaskStore(s => s.addProject)
   const navigate = useNavigate()
 
   const [newProjectOpen, setNewProjectOpen] = useState(false)
+  const [newLabelOpen, setNewLabelOpen] = useState(false)
   const [projectName, setProjectName] = useState('')
   const [projectColor, setProjectColor] = useState<string>(PROJECT_COLORS[0])
 
@@ -77,6 +80,8 @@ export function AppShell() {
         case '?':
           e.preventDefault(); ui.setShortcutsOpen(true); break
         case 'Escape':
+          /* Com modal/sheet aberto, o Escape pertence a ele */
+          if (document.querySelector('[role="dialog"]')) break
           if (ui.expandedId) ui.setExpanded(null)
           else if (ui.selectedId) ui.setSelected(null)
           break
@@ -165,6 +170,32 @@ export function AppShell() {
             <p className="px-3 py-1 text-xs text-ink-faint">Nenhum projeto ainda</p>
           )}
         </nav>
+
+        {/* ── Etiquetas ── */}
+        <div className="mt-7 mb-1.5 flex items-center justify-between px-3">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-faint">
+            Etiquetas
+          </span>
+          <button
+            onClick={() => setNewLabelOpen(true)}
+            aria-label="Nova etiqueta"
+            className="flex size-6 cursor-pointer items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-surface hover:text-ink"
+          >
+            <Plus size={14} />
+          </button>
+        </div>
+
+        <nav className="flex flex-col gap-0.5 overflow-y-auto">
+          {labels.map(l => (
+            <NavLink key={l.id} to={`/etiqueta/${l.id}`} className={navItem}>
+              <Tag size={13} className="shrink-0" style={{ color: l.color }} fill={`${l.color}40`} />
+              <span className="truncate">{l.name}</span>
+            </NavLink>
+          ))}
+          {labels.length === 0 && (
+            <p className="px-3 py-1 text-xs text-ink-faint">Nenhuma etiqueta ainda</p>
+          )}
+        </nav>
       </aside>
 
       {/* ── Conteúdo ── */}
@@ -220,6 +251,7 @@ export function AppShell() {
       <ShortcutsModal />
       <QuickAddSheet />
       <TaskDetailSheet />
+      <LabelEditModal open={newLabelOpen} onClose={() => setNewLabelOpen(false)} />
     </div>
   )
 }

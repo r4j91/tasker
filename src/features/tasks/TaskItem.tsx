@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
-import { Calendar, Trash2, FolderOpen, Check, CalendarClock, Rows3, GitFork } from 'lucide-react'
+import { Calendar, Trash2, FolderOpen, Check, CalendarClock, Rows3, GitFork, Tag } from 'lucide-react'
 import { format, addDays } from 'date-fns'
 import type { Task, Priority } from './types'
 import { useTaskStore } from '../../stores/useTaskStore'
@@ -9,6 +9,7 @@ import { Checkbox } from '../../components/ui/Checkbox'
 import { Button } from '../../components/ui/Button'
 import { Modal } from '../../components/ui/Modal'
 import { SubtaskList } from './SubtaskList'
+import { LabelPickerModal } from '../labels/LabelPickerModal'
 import { dueLabel, isOverdue, isDueToday, todayISO } from '../../lib/dates'
 import { playCompleteSound } from '../../lib/sound'
 import { cn } from '../../lib/cn'
@@ -38,6 +39,7 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
   const deleteTask = useTaskStore(s => s.deleteTask)
   const projects = useTaskStore(s => s.projects)
   const sections = useTaskStore(s => s.sections)
+  const allLabels = useTaskStore(s => s.labels)
   /* Contagens primitivas — evita re-render por identidade de array */
   const subtaskTotal = useTaskStore(s => s.tasks.reduce((n, t) => (t.parentId === task.id ? n + 1 : n), 0))
   const subtaskDone = useTaskStore(s => s.tasks.reduce((n, t) => (t.parentId === task.id && t.completed ? n + 1 : n), 0))
@@ -53,6 +55,11 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
   const toggleChecked = useUiStore(s => s.toggleChecked)
 
   const [scheduleOpen, setScheduleOpen] = useState(false)
+  const [labelsOpen, setLabelsOpen] = useState(false)
+
+  const taskLabels = task.labels
+    .map(id => allLabels.find(l => l.id === id))
+    .filter((l): l is NonNullable<typeof l> => !!l)
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pressOrigin = useRef<{ x: number; y: number } | null>(null)
   const longPressFired = useRef(false)
@@ -242,8 +249,8 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
           )}
 
           {/* Metadados — abaixo do título, estilo Todoist */}
-          {(due || subtaskTotal > 0 || (project && !hideProject)) && (
-            <span className="flex w-full items-center gap-2 text-[13px] md:text-xs">
+          {(due || subtaskTotal > 0 || taskLabels.length > 0 || (project && !hideProject)) && (
+            <span className="flex w-full flex-wrap items-center gap-2 text-[13px] md:text-xs">
               {subtaskTotal > 0 && (
                 <span className="flex items-center gap-1 text-ink-faint">
                   <GitFork size={11} className="rotate-180" />
@@ -256,6 +263,12 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
                   {dueLabel(due)}{task.dueTime && ` ${task.dueTime}`}
                 </span>
               )}
+              {taskLabels.map(l => (
+                <span key={l.id} className="flex items-center gap-1 text-ink-muted">
+                  <Tag size={11} style={{ color: l.color }} fill={`${l.color}40`} />
+                  {l.name}
+                </span>
+              ))}
               {project && !hideProject && (
                 <span className="ml-auto flex items-center gap-1.5 text-ink-faint">
                   {project.name}
@@ -360,6 +373,17 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
                   ))}
                 </div>
 
+                <button
+                  onClick={() => setLabelsOpen(true)}
+                  className={cn(
+                    'flex h-11 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 text-[13px] text-ink-muted transition-colors hover:border-line-strong md:h-8 md:px-2.5 md:text-xs',
+                    taskLabels.length > 0 && 'text-ink',
+                  )}
+                >
+                  <Tag size={14} />
+                  {taskLabels.length > 0 ? `${taskLabels.length} etiqueta${taskLabels.length > 1 ? 's' : ''}` : 'Etiquetas'}
+                </button>
+
                 <Button
                   variant="ghost"
                   size="sm"
@@ -374,6 +398,8 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
           </motion.div>
         )}
       </AnimatePresence>
+
+      <LabelPickerModal open={labelsOpen} onClose={() => setLabelsOpen(false)} taskId={task.id} />
 
       {/* Concluir a mãe com sub-tarefas pendentes */}
       <Modal

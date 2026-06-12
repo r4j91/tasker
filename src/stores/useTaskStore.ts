@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage, type StateStorage } from 'zustand/middleware'
 import { get as idbGet, set as idbSet, del as idbDel } from 'idb-keyval'
-import type { Task, Project, Section, Priority } from '../features/tasks/types'
+import type { Task, Project, Section, Label, Priority } from '../features/tasks/types'
+import { LABEL_COLORS } from '../features/tasks/types'
 
 /* Persistência em IndexedDB via idb-keyval */
 const idbStorage: StateStorage = {
@@ -19,10 +20,11 @@ interface TaskStore {
   tasks: Task[]
   projects: Project[]
   sections: Section[]
+  labels: Label[]
   /** Tarefa recém-excluída aguardando undo (não persiste) */
   pendingDelete: PendingDelete | null
 
-  addTask: (input: { title: string; dueDate?: string | null; dueTime?: string | null; projectId?: string | null; sectionId?: string | null; parentId?: string | null; priority?: Priority }) => void
+  addTask: (input: { title: string; dueDate?: string | null; dueTime?: string | null; projectId?: string | null; sectionId?: string | null; parentId?: string | null; priority?: Priority; labels?: string[] }) => void
   updateTask: (id: string, patch: Partial<Omit<Task, 'id'>>) => void
   toggleComplete: (id: string) => void
   completeMany: (ids: string[]) => void
@@ -34,6 +36,10 @@ interface TaskStore {
   addProject: (name: string, color: string) => Project
   updateProject: (id: string, patch: Partial<Omit<Project, 'id'>>) => void
   deleteProject: (id: string) => void
+
+  addLabel: (name: string, color?: string) => Label
+  updateLabel: (id: string, patch: Partial<Omit<Label, 'id'>>) => void
+  deleteLabel: (id: string) => void
 
   addSection: (projectId: string, name: string) => Section
   updateSection: (id: string, patch: Partial<Omit<Section, 'id' | 'projectId'>>) => void
@@ -48,9 +54,10 @@ export const useTaskStore = create<TaskStore>()(
       tasks: [],
       projects: [],
       sections: [],
+      labels: [],
       pendingDelete: null,
 
-      addTask: ({ title, dueDate = null, dueTime = null, projectId = null, sectionId = null, parentId = null, priority = 4 }) => {
+      addTask: ({ title, dueDate = null, dueTime = null, projectId = null, sectionId = null, parentId = null, priority = 4, labels = [] }) => {
         const trimmed = title.trim()
         if (!trimmed) return
         const { tasks } = get()
@@ -69,7 +76,7 @@ export const useTaskStore = create<TaskStore>()(
           projectId,
           sectionId,
           parentId,
-          labels: [],
+          labels,
           priority,
           order,
           createdAt: new Date().toISOString(),
@@ -174,6 +181,34 @@ export const useTaskStore = create<TaskStore>()(
           ),
         })),
 
+      addLabel: (name, color) => {
+        const { labels } = get()
+        /* Sem cor definida: a próxima cor livre da paleta */
+        const used = new Set(labels.map(l => l.color))
+        const free = LABEL_COLORS.find(c => !used.has(c.hex))?.hex ?? LABEL_COLORS[0].hex
+        const label: Label = {
+          id: crypto.randomUUID(),
+          name: name.trim(),
+          color: color ?? free,
+          order: labels.length,
+        }
+        set(s => ({ labels: [...s.labels, label] }))
+        return label
+      },
+
+      updateLabel: (id, patch) =>
+        set(s => ({
+          labels: s.labels.map(l => (l.id === id ? { ...l, ...patch } : l)),
+        })),
+
+      deleteLabel: (id) =>
+        set(s => ({
+          labels: s.labels.filter(l => l.id !== id),
+          tasks: s.tasks.map(t =>
+            t.labels.includes(id) ? { ...t, labels: t.labels.filter(x => x !== id) } : t,
+          ),
+        })),
+
       addSection: (projectId, name) => {
         const section: Section = {
           id: crypto.randomUUID(),
@@ -232,7 +267,7 @@ export const useTaskStore = create<TaskStore>()(
     {
       name: 'tasker-data',
       storage: createJSONStorage(() => idbStorage),
-      partialize: (s) => ({ tasks: s.tasks, projects: s.projects, sections: s.sections }),
+      partialize: (s) => ({ tasks: s.tasks, projects: s.projects, sections: s.sections, labels: s.labels }),
     },
   ),
 )

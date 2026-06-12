@@ -36,6 +36,38 @@ export interface Section {
   collapsed: boolean
 }
 
+export interface Label {
+  id: string
+  name: string
+  /** Hex da paleta Todoist */
+  color: string
+  order: number
+}
+
+/** Paleta de cores do Todoist (nome + hex) */
+export const LABEL_COLORS: Array<{ name: string; hex: string }> = [
+  { name: 'Berry Red',  hex: '#B8256F' },
+  { name: 'Red',        hex: '#DB4035' },
+  { name: 'Orange',     hex: '#FF9933' },
+  { name: 'Yellow',     hex: '#FAD000' },
+  { name: 'Olive',      hex: '#AFB83B' },
+  { name: 'Lime',       hex: '#7ECC49' },
+  { name: 'Green',      hex: '#299438' },
+  { name: 'Mint',       hex: '#6ACCBC' },
+  { name: 'Teal',       hex: '#158FAD' },
+  { name: 'Sky Blue',   hex: '#14AAF5' },
+  { name: 'Light Blue', hex: '#96C3EB' },
+  { name: 'Blue',       hex: '#4073FF' },
+  { name: 'Grape',      hex: '#884DFF' },
+  { name: 'Violet',     hex: '#AF38EB' },
+  { name: 'Lavender',   hex: '#EB96EB' },
+  { name: 'Magenta',    hex: '#E05194' },
+  { name: 'Salmon',     hex: '#FF8D85' },
+  { name: 'Charcoal',   hex: '#808080' },
+  { name: 'Grey',       hex: '#B8B8B8' },
+  { name: 'Taupe',      hex: '#CCAC93' },
+]
+
 export const PROJECT_COLORS = [
   'oklch(0.78 0.07 262)',  // azul sereno
   'oklch(0.84 0.07 70)',   // pêssego

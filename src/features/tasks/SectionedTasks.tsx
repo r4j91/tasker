@@ -207,7 +207,7 @@ function SectionBlock({ section, tasks, canMoveUp, canMoveDown }: {
   const projects = useTaskStore(s => s.projects)
 
   const submitTask = () => {
-    const parsed = parseTask(newTitle, projects)
+    const parsed = parseTask(newTitle, projects, useTaskStore.getState().labels)
     if (!parsed.title.trim()) return
     addTask({
       title: parsed.title,
@@ -216,6 +216,7 @@ function SectionBlock({ section, tasks, canMoveUp, canMoveDown }: {
       priority: parsed.priority,
       projectId: section.projectId,
       sectionId: section.id,
+      labels: parsed.labelIds,
     })
     setNewTitle('')
   }

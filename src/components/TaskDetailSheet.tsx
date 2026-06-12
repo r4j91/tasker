@@ -1,7 +1,8 @@
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useState } from 'react'
 import {
-  X, Text, Hash, Calendar, Flag, Trash2, CalendarClock, Check,
+  X, Text, Hash, Calendar, Flag, Trash2, CalendarClock, Check, Tag,
 } from 'lucide-react'
 import { format, parseISO } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -9,6 +10,7 @@ import { useUiStore } from '../stores/useUiStore'
 import { useTaskStore } from '../stores/useTaskStore'
 import { Checkbox } from './ui/Checkbox'
 import { SubtaskList } from '../features/tasks/SubtaskList'
+import { LabelPickerModal } from '../features/labels/LabelPickerModal'
 import { playCompleteSound } from '../lib/sound'
 import type { Priority } from '../features/tasks/types'
 import { cn } from '../lib/cn'
@@ -26,6 +28,8 @@ export function TaskDetailSheet() {
   const task = useTaskStore(s => s.tasks.find(t => t.id === taskId))
   const projects = useTaskStore(s => s.projects)
   const sections = useTaskStore(s => s.sections)
+  const allLabels = useTaskStore(s => s.labels)
+  const [labelsOpen, setLabelsOpen] = useState(false)
   const updateTask = useTaskStore(s => s.updateTask)
   const toggleComplete = useTaskStore(s => s.toggleComplete)
   const completeMany = useTaskStore(s => s.completeMany)
@@ -223,6 +227,33 @@ export function TaskDetailSheet() {
                 </div>
               </Row>
 
+              {/* Etiquetas */}
+              <Row icon={<Tag size={18} />}>
+                <button
+                  onClick={() => setLabelsOpen(true)}
+                  className="flex min-h-9 w-full cursor-pointer flex-wrap items-center gap-2 text-left"
+                >
+                  {task.labels.length > 0 ? (
+                    task.labels.map(id => {
+                      const l = allLabels.find(x => x.id === id)
+                      if (!l) return null
+                      return (
+                        <span
+                          key={id}
+                          className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[13px] font-medium text-ink"
+                          style={{ backgroundColor: `${l.color}2E` }}
+                        >
+                          <span className="size-2 rounded-full" style={{ background: l.color }} />
+                          {l.name}
+                        </span>
+                      )
+                    })
+                  ) : (
+                    <span className="text-[15px] text-ink-faint">Etiquetas</span>
+                  )}
+                </button>
+              </Row>
+
               {/* Sub-tarefas */}
               <div className="pt-4">
                 <p className="mb-1 text-[15px] font-semibold">Subtarefas</p>
@@ -234,6 +265,8 @@ export function TaskDetailSheet() {
                 Criada em {format(parseISO(task.createdAt), "d 'de' MMMM 'de' yyyy", { locale: ptBR })}
               </p>
             </div>
+
+            <LabelPickerModal open={labelsOpen} onClose={() => setLabelsOpen(false)} taskId={task.id} />
           </motion.div>
         </div>
       )}

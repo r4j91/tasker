@@ -8,6 +8,7 @@ import { ProjectPage } from './pages/ProjectPage'
 import { ProjectsPage } from './pages/ProjectsPage'
 import { BrowsePage } from './pages/BrowsePage'
 import { FiltersPage, PriorityFilterPage } from './pages/FiltersPage'
+import { LabelViewPage } from './pages/LabelViewPage'
 import { DesignSystem } from './pages/DesignSystem'
 import { useUiStore } from './stores/useUiStore'
 
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/navegar" element={<BrowsePage />} />
           <Route path="/filtros" element={<FiltersPage />} />
           <Route path="/filtros/p/:p" element={<PriorityFilterPage />} />
+          <Route path="/etiqueta/:id" element={<LabelViewPage />} />
           <Route path="/projeto/:id" element={<ProjectPage />} />
           <Route path="*" element={<InboxPage />} />
         </Route>

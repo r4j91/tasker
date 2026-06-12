@@ -53,6 +53,7 @@ export function QuickAdd({ projectId = null, dueDate = null }: QuickAddProps) {
       dueTime: parsed.dueTime,
       projectId: parsed.projectId ?? projectId,
       priority: parsed.priority,
+      labels: parsed.labelIds,
     })
     setTitle('')
     inputRef.current?.focus()

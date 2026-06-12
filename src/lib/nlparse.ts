@@ -1,12 +1,14 @@
 import { addDays, format, setDate, addMonths, startOfDay } from 'date-fns'
-import type { Priority, Project } from '../features/tasks/types'
+import type { Priority, Project, Label } from '../features/tasks/types'
 
-export type SegmentType = 'date' | 'time' | 'project' | 'priority'
+export type SegmentType = 'date' | 'time' | 'project' | 'priority' | 'label'
 
 export interface Segment {
   start: number
   end: number
   type: SegmentType
+  /** Cor real da etiqueta correspondente (segments de label) */
+  color?: string
 }
 
 export interface ParseResult {
@@ -17,6 +19,8 @@ export interface ParseResult {
   priority: Priority
   /** Projeto resolvido por #nome (se existir) */
   projectId: string | null
+  /** Etiquetas resolvidas por @nome */
+  labelIds: string[]
   /** Trechos reconhecidos no texto original, para destacar */
   segments: Segment[]
 }
@@ -38,19 +42,33 @@ function nextWeekday(target: number, forceNext: boolean): Date {
  * Interpreta linguagem natural pt-BR num título de tarefa.
  * Ex.: "reunião segunda 14h #trabalho p1"
  */
-export function parseTask(input: string, projects: Project[]): ParseResult {
+export function parseTask(input: string, projects: Project[], labels: Label[] = []): ParseResult {
   const segments: Segment[] = []
   let dueDate: string | null = null
   let dueTime: string | null = null
   let priority: Priority = 4
   let projectId: string | null = null
+  const labelIds: string[] = []
 
   const lower = input.toLowerCase()
   const taken: Array<[number, number]> = []
   const overlaps = (s: number, e: number) => taken.some(([ts, te]) => s < te && e > ts)
-  const claim = (s: number, e: number, type: SegmentType) => {
+  const claim = (s: number, e: number, type: SegmentType, color?: string) => {
     taken.push([s, e])
-    segments.push({ start: s, end: e, type })
+    segments.push({ start: s, end: e, type, color })
+  }
+
+  /* ── Etiquetas: @nome (apenas se existir; criação é papel do autocomplete) ── */
+  for (const m of lower.matchAll(/(?<=^|\s)@([\wà-ú-]+)/g)) {
+    const s = m.index!, e = s + m[0].length
+    if (overlaps(s, e)) continue
+    const name = m[1]
+    const match = labels.find(l =>
+      l.name.toLowerCase() === name || l.name.toLowerCase().startsWith(name),
+    )
+    if (!match) continue
+    if (!labelIds.includes(match.id)) labelIds.push(match.id)
+    claim(s, e, 'label', match.color)
   }
 
   /* ── Prioridade: p1–p4 ── */
@@ -147,5 +165,5 @@ export function parseTask(input: string, projects: Project[]): ParseResult {
   title = title.replace(/\s{2,}/g, ' ').trim()
 
   segments.sort((a, b) => a.start - b.start)
-  return { title, dueDate, dueTime, priority, projectId, segments }
+  return { title, dueDate, dueTime, priority, projectId, labelIds, segments }
 }
