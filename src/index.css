@@ -179,6 +179,13 @@ body {
   padding-inline: 24px;
 }
 
+/* Desktop: alinha à esquerda (sidebar já provê recuo via pl-60) */
+@media (min-width: 768px) {
+  .page-wrap {
+    margin-inline-start: 0;
+  }
+}
+
 /* Foco visível para teclado — em @layer base para utilities (outline-none)
    poderem sobrescrever; regras fora de layer venceriam sempre. */
 @layer base {

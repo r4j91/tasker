@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Inbox, CalendarRange, Plus, Sun, Moon, Search, Tag, SlidersHorizontal } from 'lucide-react'
+import { Inbox, CalendarRange, Plus, Sun, Moon, Search, Tag, SlidersHorizontal, Camera } from 'lucide-react'
 import { useTaskStore } from '../stores/useTaskStore'
 import { useUiStore } from '../stores/useUiStore'
 import { PROJECT_COLORS, type Priority } from '../features/tasks/types'
@@ -68,6 +68,21 @@ export function AppShell() {
   const [newLabelOpen, setNewLabelOpen] = useState(false)
   const [projectName, setProjectName] = useState('')
   const [projectColor, setProjectColor] = useState<string>(PROJECT_COLORS[0])
+
+  /* Avatar — persiste em localStorage */
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(() => localStorage.getItem('avatar'))
+  const avatarInputRef = useRef<HTMLInputElement>(null)
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = ev => {
+      const url = ev.target?.result as string
+      setAvatarUrl(url)
+      localStorage.setItem('avatar', url)
+    }
+    reader.readAsDataURL(file)
+  }
 
   /* ── Atalhos globais de teclado ── */
   useEffect(() => {
@@ -136,14 +151,40 @@ export function AppShell() {
 
       {/* ── Sidebar (desktop) ── */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-line bg-surface/60 px-3 pt-5 pb-4 md:flex">
-        <div className="mb-6 flex items-center justify-between px-3">
-          <span className="text-[15px] font-bold tracking-tight">TASKER</span>
+        {/* Avatar + tema */}
+        <div className="mb-5 flex items-center gap-2.5 px-3">
+          <button
+            onClick={() => avatarInputRef.current?.click()}
+            aria-label="Alterar foto de perfil"
+            className="group relative size-8 shrink-0 cursor-pointer overflow-hidden rounded-full transition-opacity hover:opacity-90"
+          >
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="Avatar" className="size-full object-cover" />
+            ) : (
+              <span className="flex size-full items-center justify-center bg-primary-subtle text-[11px] font-semibold text-primary-ink">
+                TA
+              </span>
+            )}
+            {/* Overlay de câmera no hover */}
+            <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+              <Camera size={12} className="text-white" />
+            </span>
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAvatarChange}
+            />
+          </button>
+
+          <span className="flex-1 truncate text-[13px] font-medium text-ink-muted">Meu espaço</span>
+
           <button
             onClick={onToggleTheme}
             aria-label="Alternar tema"
-            className="relative flex size-7 cursor-pointer items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-surface hover:text-ink"
+            className="relative flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-ink-faint transition-[background-color,color] hover:bg-surface hover:text-ink"
           >
-            {/* Crossfade contextual entre os ícones */}
             <AnimatePresence initial={false} mode="popLayout">
               <motion.span
                 key={dark ? 'sun' : 'moon'}
