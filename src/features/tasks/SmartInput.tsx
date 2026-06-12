@@ -2,7 +2,7 @@ import { forwardRef, useEffect, useMemo, useRef, useState, type InputHTMLAttribu
 import { Calendar, Clock, Flag, FolderOpen, Tag, Plus } from 'lucide-react'
 import { parseTask, type ParseResult, type SegmentType } from '../../lib/nlparse'
 import { useTaskStore } from '../../stores/useTaskStore'
-import { dueLabel } from '../../lib/dates'
+import { dueLabel, dueColorVar } from '../../lib/dates'
 import { cn } from '../../lib/cn'
 
 interface SmartInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> {
@@ -191,7 +191,7 @@ export const SmartInput = forwardRef<HTMLInputElement, SmartInputProps>(
         {(parsed.dueDate || parsed.priority < 4 || project || parsedLabels.length > 0) && (
           <div className="mt-1.5 flex flex-wrap items-center gap-2 px-1 text-xs text-ink-muted">
             {parsed.dueDate && (
-              <span className="flex items-center gap-1 text-today">
+              <span className="flex items-center gap-1" style={{ color: dueColorVar(parsed.dueDate) }}>
                 <Calendar size={12} /> {dueLabel(parsed.dueDate)}
               </span>
             )}

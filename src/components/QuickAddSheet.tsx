@@ -9,7 +9,7 @@ import { useTaskStore } from '../stores/useTaskStore'
 import { SmartInput } from '../features/tasks/SmartInput'
 import type { ParseResult } from '../lib/nlparse'
 import type { Priority } from '../features/tasks/types'
-import { todayISO, dueLabel } from '../lib/dates'
+import { todayISO, dueLabel, dueColorVar } from '../lib/dates'
 import { useKeyboardInset } from '../lib/useKeyboardInset'
 import { cn } from '../lib/cn'
 
@@ -135,8 +135,9 @@ export function QuickAddSheet() {
                   onClick={() => { setDueMenu(o => !o); setPrioMenu(false) }}
                   className={cn(
                     'flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 text-[13px] font-medium transition-colors',
-                    effDue ? 'text-today' : 'text-ink-muted',
+                    !effDue && 'text-ink-muted',
                   )}
+                  style={effDue ? { color: dueColorVar(effDue) } : undefined}
                 >
                   <Calendar size={14} />
                   {effDue ? dueLabel(effDue) : 'Vencimento'}

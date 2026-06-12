@@ -9,7 +9,7 @@ import { useUiStore } from '../../stores/useUiStore'
 import { Checkbox } from '../../components/ui/Checkbox'
 import { Button } from '../../components/ui/Button'
 import { Modal } from '../../components/ui/Modal'
-import { dueLabel, isOverdue, isDueToday, todayISO } from '../../lib/dates'
+import { dueLabel, dueColorVar, todayISO } from '../../lib/dates'
 import { playCompleteSound } from '../../lib/sound'
 import { cn } from '../../lib/cn'
 
@@ -97,9 +97,6 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
 
   const project = projects.find(p => p.id === task.projectId)
   const due = task.dueDate
-  const dueTone = due
-    ? isOverdue(due) ? 'text-overdue' : isDueToday(due) ? 'text-today' : 'text-ink-muted'
-    : ''
 
   const complete = () => {
     /* Concluir a mãe com sub-tarefas pendentes pergunta antes */
@@ -245,7 +242,7 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
                 </span>
               )}
               {due && (
-                <span className={cn('flex items-center gap-1', dueTone)}>
+                <span className="flex items-center gap-1" style={{ color: dueColorVar(due) }}>
                   <Calendar size={12} />
                   {dueLabel(due)}{task.dueTime && ` ${task.dueTime}`}
                 </span>

@@ -22,6 +22,16 @@ export function dueLabel(iso: string): string {
   return format(d, "d MMM yyyy", { locale: ptBR })
 }
 
+/** Cor semântica da data (tokens --date-*): hoje verde, atrasada
+    vermelha, amanhã âmbar, futuro roxo. */
+export function dueColorVar(iso: string): string {
+  const d = parseDue(iso)
+  if (isOverdue(iso)) return 'var(--date-overdue)'
+  if (isToday(d)) return 'var(--date-today)'
+  if (isTomorrow(d)) return 'var(--date-tomorrow)'
+  return 'var(--date-future)'
+}
+
 const capitalizeFirst = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
 /** Cabeçalho de grupo na tela Em breve */

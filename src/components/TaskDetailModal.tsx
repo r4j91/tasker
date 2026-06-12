@@ -12,7 +12,7 @@ import { Checkbox } from './ui/Checkbox'
 import { Popover } from './ui/Popover'
 import { SubtaskList } from '../features/tasks/SubtaskList'
 import { playCompleteSound } from '../lib/sound'
-import { todayISO, dueLabel } from '../lib/dates'
+import { todayISO, dueLabel, dueColorVar } from '../lib/dates'
 import type { Priority } from '../features/tasks/types'
 import { cn } from '../lib/cn'
 
@@ -288,7 +288,7 @@ export function TaskDetailModal() {
                   onClose={closePopover}
                   value={
                     task.dueDate ? (
-                      <span className="flex items-center gap-1.5 text-today">
+                      <span className="flex items-center gap-1.5" style={{ color: dueColorVar(task.dueDate) }}>
                         <Calendar size={14} />
                         {dueLabel(task.dueDate)}{task.dueTime && ` ${task.dueTime}`}
                       </span>
