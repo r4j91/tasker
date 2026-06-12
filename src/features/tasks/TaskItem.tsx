@@ -168,8 +168,10 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
         /* Divisória inset: começa na coluna do conteúdo da linha (Todoist) */
         'relative after:absolute after:bottom-0 after:right-0 after:h-px after:bg-line',
         nested ? 'after:left-[62px]' : subtasks.length > 0 ? 'after:left-9' : 'after:left-1',
+        /* Borda sempre presente (transparent sem projeto) para alinhar todas as linhas */
+        !nested && 'transition-[border-left-color] duration-200',
       )}
-      style={project && !nested ? { borderLeft: `3px solid ${project.color}` } : undefined}
+      style={{ borderLeft: `3px solid ${project && !nested ? project.color : 'transparent'}` }}
     >
       {/* Fundos revelados pelo swipe (apenas touch) */}
       {isTouch && (
@@ -208,7 +210,7 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
           setCtxPoint({ x: e.clientX, y: e.clientY })
         }}
         className={cn(
-          'relative flex items-start gap-2 px-1 transition-colors',
+          'relative flex items-start gap-2 px-1 transition-[background-color]',
           'md:hover:bg-surface/50',
           /* Feedback transitório de toque — só enquanto o dedo pressiona a linha */
           'has-[[data-row-main]:active]:bg-surface/60',
@@ -225,8 +227,9 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
             aria-expanded={subsOpen}
             aria-label={subsOpen ? 'Recolher sub-tarefas' : 'Expandir sub-tarefas'}
             className={cn(
-              'relative mt-[10px] md:mt-2 flex size-7 shrink-0 -ml-1 cursor-pointer items-center justify-center rounded-md text-ink-faint transition-colors',
-              'active:bg-surface md:hover:bg-surface md:hover:text-ink',
+              'relative mt-[10px] md:mt-2 flex size-7 shrink-0 -ml-1 cursor-pointer items-center justify-center rounded-md text-ink-faint',
+              'transition-[background-color,color,scale] duration-150',
+              'active:scale-[0.96] active:bg-surface md:hover:bg-surface md:hover:text-ink',
               /* Área de toque 44px na vertical; à direita para, para não invadir o checkbox */
               'after:absolute after:-inset-y-2 after:-left-2 after:right-0',
             )}

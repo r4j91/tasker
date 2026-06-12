@@ -33,7 +33,7 @@ export function Checkbox({ checked, onChange, label, className, disabled, tint, 
       <motion.span
         aria-hidden
         className={cn(
-          'relative shrink-0 rounded-full border-2 transition-colors duration-150',
+          'relative shrink-0 overflow-hidden rounded-full border-2 transition-[border-color,background-color] duration-150',
           small ? 'size-[15px]' : 'size-[18px]',
         )}
         style={{
@@ -44,7 +44,7 @@ export function Checkbox({ checked, onChange, label, className, disabled, tint, 
         }}
         initial={false}
         animate={checked ? { scale: [1, 1.18, 1] } : { scale: 1 }}
-        whileTap={{ scale: 0.92 }}
+        whileTap={{ scale: 0.95 }}
         transition={{ duration: 0.3, times: [0, 0.4, 1], ease: 'easeOut' }}
       >
         {/* Preenchimento irradiando do centro ao concluir */}
@@ -56,7 +56,7 @@ export function Checkbox({ checked, onChange, label, className, disabled, tint, 
           animate={checked ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
           transition={{ duration: 0.18, ease: 'easeOut' }}
         />
-        <AnimatePresence>
+        <AnimatePresence initial={false}>
           {checked && (
             <motion.svg
               viewBox="0 0 12 10"
