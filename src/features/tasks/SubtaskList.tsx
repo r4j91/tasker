@@ -9,6 +9,9 @@ import { playCompleteSound } from '../../lib/sound'
 import { parseTask } from '../../lib/nlparse'
 import { cn } from '../../lib/cn'
 
+/* No touch o arraste de reordenar conflita com o toque normal */
+const isTouch = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+
 interface SubtaskListProps {
   parentId: string
   /** Cabeçalho "Sub-tarefas N/M" no topo do bloco */
@@ -77,6 +80,7 @@ export function SubtaskList({ parentId, header }: SubtaskListProps) {
               <Reorder.Item
                 key={sub.id}
                 value={sub.id}
+                dragListener={!isTouch}
                 layout
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}

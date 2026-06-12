@@ -10,10 +10,14 @@ interface TaskListProps {
   reorderable?: boolean
 }
 
+/* No touch o reordenar por arraste conflita com swipe/toque longo:
+   o Reorder capturava o pointerdown e movia o bloco inteiro junto. */
+const isTouch = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+
 export function TaskList({ tasks, hideProject, reorderable = true }: TaskListProps) {
   const reorderTasks = useTaskStore(s => s.reorderTasks)
 
-  if (reorderable) {
+  if (reorderable && !isTouch) {
     return (
       <Reorder.Group
         axis="y"

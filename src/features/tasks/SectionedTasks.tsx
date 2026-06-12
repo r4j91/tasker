@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import {
-  DndContext, DragOverlay, PointerSensor, TouchSensor, useSensor, useSensors,
+  DndContext, DragOverlay, PointerSensor, useSensor, useSensors,
   closestCorners, useDroppable, type DragStartEvent, type DragOverEvent, type DragEndEvent,
 } from '@dnd-kit/core'
 import {
@@ -41,9 +41,12 @@ export function SectionedTasks({ projectId }: SectionedTasksProps) {
       .filter(t => !t.completed && !t.parentId && t.projectId === projectId && (t.sectionId ?? null) === sectionId)
       .sort((a, b) => a.order - b.order)
 
+  /* No touch o arraste disputa com o toque longo de seleção (450ms) e o
+     swipe; mover seção/tarefa no mobile fica pelo menu. Distância
+     inalcançável desativa o sensor em ponteiro grosso. */
+  const isTouch = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 400, tolerance: 8 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: isTouch ? 999999 : 6 } }),
   )
 
   const containerOf = (id: string): string | null => {
