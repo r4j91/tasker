@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -14,6 +14,7 @@ import { SubtaskList } from '../features/tasks/SubtaskList'
 import { playCompleteSound } from '../lib/sound'
 import { todayISO, dueLabel, dueColorVar } from '../lib/dates'
 import { useFocusTrap } from '../lib/useFocusTrap'
+import { recentPointer } from '../lib/pointer'
 import type { Priority } from '../features/tasks/types'
 import { cn } from '../lib/cn'
 
@@ -54,6 +55,20 @@ export function TaskDetailModal() {
   }
 
   useFocusTrap(panelRef, !!task)
+
+  /* O modal "nasce" da linha clicada: origem da escala no ponto do clique */
+  const [origin, setOrigin] = useState('50% 50%')
+  useLayoutEffect(() => {
+    if (!taskId) return
+    const pt = recentPointer()
+    const el = panelRef.current
+    if (pt && el) {
+      const r = el.getBoundingClientRect()
+      setOrigin(`${pt.x - r.left}px ${pt.y - r.top}px`)
+    } else {
+      setOrigin('50% 50%')
+    }
+  }, [taskId])
 
   /* Esc fecha popover primeiro, depois o painel */
   useEffect(() => {
@@ -129,10 +144,11 @@ export function TaskDetailModal() {
           <motion.div
             ref={panelRef}
             role="dialog" aria-modal="true" aria-label={task.title}
-            initial={{ opacity: 0, scale: 0.97, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.97, y: 10 }}
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.97 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            style={{ transformOrigin: origin }}
             className="relative flex min-h-[420px] max-h-[min(80vh,640px)] w-full max-w-3xl overflow-hidden rounded-2xl border border-line bg-canvas shadow-[var(--shadow-lg)]"
           >
             {/* ── Coluna principal ── */}
