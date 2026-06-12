@@ -9,6 +9,7 @@ import { ptBR } from 'date-fns/locale'
 import { useUiStore } from '../stores/useUiStore'
 import { useTaskStore } from '../stores/useTaskStore'
 import { Checkbox } from './ui/Checkbox'
+import { Popover } from './ui/Popover'
 import { SubtaskList } from '../features/tasks/SubtaskList'
 import { playCompleteSound } from '../lib/sound'
 import { todayISO, dueLabel } from '../lib/dates'
@@ -40,8 +41,15 @@ export function TaskDetailModal() {
 
   const [popover, setPopover] = useState<PopoverKind>(null)
   const [labelQuery, setLabelQuery] = useState('')
+  /* Esc/clique-fora que fecharam um popover não podem fechar o modal junto */
+  const popGuard = useRef(0)
 
+  const closePopover = () => { popGuard.current = Date.now(); setPopover(null) }
   const close = () => { setPopover(null); setDetailTask(null) }
+  const closeUnlessPopover = () => {
+    if (Date.now() - popGuard.current < 250) return
+    close()
+  }
 
   /* Esc fecha popover primeiro, depois o painel */
   useEffect(() => {
@@ -49,8 +57,9 @@ export function TaskDetailModal() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return
       e.stopPropagation()
+      if (Date.now() - popGuard.current < 250) return
       setPopover(p => {
-        if (p) return null
+        if (p) { popGuard.current = Date.now(); return null }
         close()
         return null
       })
@@ -110,7 +119,7 @@ export function TaskDetailModal() {
             className="absolute inset-0 bg-black/40"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            onClick={close}
+            onClick={closeUnlessPopover}
           />
 
           <motion.div
@@ -183,6 +192,7 @@ export function TaskDetailModal() {
                 <Chip
                   open={popover === 'date'}
                   onToggle={() => setPopover(p => (p === 'date' ? null : 'date'))}
+                  onClose={closePopover}
                   active={!!task.dueDate}
                   activeCls="text-today"
                   icon={<Calendar size={14} />}
@@ -225,6 +235,7 @@ export function TaskDetailModal() {
                 <Chip
                   open={popover === 'priority'}
                   onToggle={() => setPopover(p => (p === 'priority' ? null : 'priority'))}
+                  onClose={closePopover}
                   active={task.priority < 4}
                   activeStyle={task.priority < 4 ? { color: PRIORITY_TINTS[task.priority] } : undefined}
                   icon={<Flag size={14} fill={task.priority < 4 ? 'currentColor' : 'none'} />}
@@ -246,6 +257,7 @@ export function TaskDetailModal() {
                 <Chip
                   open={popover === 'labels'}
                   onToggle={() => { setLabelQuery(''); setPopover(p => (p === 'labels' ? null : 'labels')) }}
+                  onClose={closePopover}
                   active={taskLabels.length > 0}
                   icon={<Tag size={14} />}
                   label={
@@ -309,6 +321,7 @@ export function TaskDetailModal() {
                 <Chip
                   open={popover === 'project'}
                   onToggle={() => setPopover(p => (p === 'project' ? null : 'project'))}
+                  onClose={closePopover}
                   active={!!project}
                   icon={<Hash size={14} />}
                   label={project ? `${project.name}${section ? ` / ${section.name}` : ''}` : 'Projeto'}
@@ -393,9 +406,10 @@ export function TaskDetailModal() {
 
 /* ── Blocos de UI ── */
 
-function Chip({ open, onToggle, active, activeCls, activeStyle, icon, label, children, wide }: {
+function Chip({ open, onToggle, onClose, active, activeCls, activeStyle, icon, label, children, wide }: {
   open: boolean
   onToggle: () => void
+  onClose: () => void
   active: boolean
   activeCls?: string
   activeStyle?: React.CSSProperties
@@ -404,35 +418,28 @@ function Chip({ open, onToggle, active, activeCls, activeStyle, icon, label, chi
   children: ReactNode
   wide?: boolean
 }) {
-  const ref = useRef<HTMLDivElement>(null)
-
   return (
-    <div ref={ref} className="relative">
-      <button
-        onClick={onToggle}
-        className={cn(
-          'flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 text-[13px] font-medium transition-colors hover:border-line-strong',
-          active ? (activeCls ?? 'text-ink') : 'text-ink-muted',
-        )}
-        style={activeStyle}
-      >
-        {icon}
-        {label}
-      </button>
-      {open && (
-        <>
-          <div className="fixed inset-0 z-10" onClick={onToggle} />
-          <div
-            className={cn(
-              'absolute left-0 top-full z-20 mt-1 rounded-xl border border-line bg-surface-elevated py-1 shadow-[var(--shadow-lg)]',
-              wide ? 'w-64' : 'w-52',
-            )}
-          >
-            {children}
-          </div>
-        </>
+    <Popover
+      open={open}
+      onClose={onClose}
+      width={wide ? 256 : 208}
+      trigger={ref => (
+        <button
+          ref={ref}
+          onClick={onToggle}
+          className={cn(
+            'flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 text-[13px] font-medium transition-colors hover:border-line-strong',
+            active ? (activeCls ?? 'text-ink') : 'text-ink-muted',
+          )}
+          style={activeStyle}
+        >
+          {icon}
+          {label}
+        </button>
       )}
-    </div>
+    >
+      {children}
+    </Popover>
   )
 }
 
