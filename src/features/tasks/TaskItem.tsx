@@ -25,21 +25,21 @@ const PRIORITY_META: Record<Priority, { label: string; tint?: string }> = {
 const isTouch = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
 
 /* Ícone de sub-tarefas: bifurcação limpa legível em tamanhos pequenos */
-function SubtaskIcon({ size = 14 }: { size?: number }) {
+function SubtaskIcon({ size = 16 }: { size?: number }) {
   return (
     <svg
-      width={size} height={size} viewBox="0 0 14 14" fill="none"
+      width={size} height={size} viewBox="0 0 16 16" fill="none"
       stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden
     >
       {/* Haste vertical */}
-      <line x1="3.5" y1="2" x2="3.5" y2="9" />
+      <line x1="4" y1="2.5" x2="4" y2="11.5" />
       {/* Ramo superior */}
-      <path d="M3.5 5h3.5" />
-      {/* Ramo inferior com curva */}
-      <path d="M3.5 9h3.5" />
-      {/* Pontinhos nas pontas */}
-      <circle cx="9" cy="5" r="1.1" fill="currentColor" stroke="none" />
-      <circle cx="9" cy="9" r="1.1" fill="currentColor" stroke="none" />
+      <path d="M4 7h5" />
+      {/* Ramo inferior */}
+      <path d="M4 11.5h5" />
+      {/* Pontos terminais */}
+      <circle cx="11" cy="7"    r="1.3" fill="currentColor" stroke="none" />
+      <circle cx="11" cy="11.5" r="1.3" fill="currentColor" stroke="none" />
     </svg>
   )
 }
@@ -174,7 +174,7 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
         /* Divisória inset: começa na coluna do conteúdo da linha (Todoist) */
         'relative after:absolute after:bottom-0 after:right-0 after:h-px after:bg-line',
         nested
-          ? 'after:left-[62px] before:absolute before:left-[36px] before:top-[22px] before:h-px before:w-[26px] before:bg-line-strong before:opacity-60'
+          ? 'after:left-[62px] before:absolute before:left-[33px] before:top-[22px] before:h-px before:w-[30px] before:bg-line-strong before:opacity-60'
           : subtasks.length > 0 ? 'after:left-9' : 'after:left-1',
         /* Borda sempre presente (transparent sem projeto) para alinhar todas as linhas */
         !nested && 'transition-[border-left-color] duration-200',

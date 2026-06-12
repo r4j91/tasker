@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Inbox, CalendarRange, Plus, Sun, Moon, Search, Tag, SlidersHorizontal, Camera } from 'lucide-react'
+import { Inbox, CalendarRange, Plus, Sun, Moon, Search, SlidersHorizontal, Camera } from 'lucide-react'
 import { useTaskStore } from '../stores/useTaskStore'
 import { useUiStore } from '../stores/useUiStore'
 import { PROJECT_COLORS, type Priority } from '../features/tasks/types'
@@ -19,7 +19,6 @@ import { QuickAddSheet } from './QuickAddSheet'
 import { TaskDetailSheet } from './TaskDetailSheet'
 import { TaskDetailModal } from './TaskDetailModal'
 import { useMediaQuery } from '../lib/useMediaQuery'
-import { LabelEditModal } from '../features/labels/LabelEditModal'
 import { cn } from '../lib/cn'
 
 
@@ -58,15 +57,13 @@ export function AppShell() {
   const dark = useUiStore(s => s.dark)
   const onToggleTheme = useUiStore(s => s.toggleDark)
   const projects = useTaskStore(s => s.projects)
-  const labels = useTaskStore(s => s.labels)
-  const tasks = useTaskStore(s => s.tasks)
+const tasks = useTaskStore(s => s.tasks)
   const addProject = useTaskStore(s => s.addProject)
   const navigate = useNavigate()
 
   const isDesktop = useMediaQuery('(min-width: 768px)')
   const [newProjectOpen, setNewProjectOpen] = useState(false)
-  const [newLabelOpen, setNewLabelOpen] = useState(false)
-  const [projectName, setProjectName] = useState('')
+const [projectName, setProjectName] = useState('')
   const [projectColor, setProjectColor] = useState<string>(PROJECT_COLORS[0])
 
   /* Avatar — persiste em localStorage */
@@ -255,31 +252,6 @@ export function AppShell() {
           )}
         </nav>
 
-        {/* ── Etiquetas ── */}
-        <div className="mt-7 mb-1.5 flex items-center justify-between px-3">
-          <span className="text-xs font-semibold uppercase tracking-[0.08em] text-ink-faint">
-            Etiquetas
-          </span>
-          <button
-            onClick={() => setNewLabelOpen(true)}
-            aria-label="Nova etiqueta"
-            className="flex size-6 cursor-pointer items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-surface hover:text-ink"
-          >
-            <Plus size={14} />
-          </button>
-        </div>
-
-        <nav className="flex flex-col gap-0.5 overflow-y-auto">
-          {labels.map(l => (
-            <NavLink key={l.id} to={`/etiqueta/${l.id}`} className={navItem}>
-              <Tag size={13} className="shrink-0" style={{ color: l.color }} fill={`${l.color}40`} />
-              <span className="truncate">{l.name}</span>
-            </NavLink>
-          ))}
-          {labels.length === 0 && (
-            <p className="px-3 py-1 text-xs text-ink-faint">Nenhuma etiqueta ainda</p>
-          )}
-        </nav>
       </aside>
 
       {/* ── Conteúdo ── */}
@@ -335,7 +307,6 @@ export function AppShell() {
       <ShortcutsModal />
       <QuickAddSheet />
       {isDesktop ? <TaskDetailModal /> : <TaskDetailSheet />}
-      <LabelEditModal open={newLabelOpen} onClose={() => setNewLabelOpen(false)} />
     </div>
   )
 }
