@@ -7,6 +7,7 @@ import { format, addDays } from 'date-fns'
 import { useUiStore } from '../stores/useUiStore'
 import { useTaskStore } from '../stores/useTaskStore'
 import { SmartInput } from '../features/tasks/SmartInput'
+import { Popover } from './ui/Popover'
 import { parseTask, type ParseResult } from '../lib/nlparse'
 import type { Priority } from '../features/tasks/types'
 import { todayISO, dueLabel, dueColorVar } from '../lib/dates'
@@ -141,66 +142,72 @@ export function QuickAddSheet() {
             {/* Chips de atributos */}
             <div className="mt-2 flex flex-wrap items-center gap-2">
               {/* Vencimento */}
-              <div className="relative">
-                <button
-                  onClick={() => { setDueMenu(o => !o); setPrioMenu(false) }}
-                  className={cn(
-                    'flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 text-[13px] font-medium transition-colors',
-                    !effDue && 'text-ink-muted',
-                  )}
-                  style={effDue ? { color: dueColorVar(effDue) } : undefined}
-                >
-                  <Calendar size={14} />
-                  {effDue ? dueLabel(effDue) : 'Vencimento'}
-                </button>
-                {dueMenu && (
-                  <div className="absolute bottom-full left-0 z-10 mb-1 w-44 rounded-xl border border-line bg-surface-elevated py-1 shadow-[var(--shadow-lg)]">
-                    {dueOptions.map(opt => (
-                      <button
-                        key={opt.label}
-                        onClick={() => { setChipDue(opt.value); setDueMenu(false) }}
-                        className="flex min-h-10 w-full cursor-pointer items-center px-3 text-left text-sm hover:bg-surface"
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
+              <Popover
+                open={dueMenu}
+                onClose={() => setDueMenu(false)}
+                width={176}
+                trigger={ref => (
+                  <button
+                    ref={ref}
+                    onClick={() => { setDueMenu(o => !o); setPrioMenu(false) }}
+                    className={cn(
+                      'flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 text-[13px] font-medium transition-colors',
+                      !effDue && 'text-ink-muted',
+                    )}
+                    style={effDue ? { color: dueColorVar(effDue) } : undefined}
+                  >
+                    <Calendar size={14} />
+                    {effDue ? dueLabel(effDue) : 'Vencimento'}
+                  </button>
                 )}
-              </div>
+              >
+                {dueOptions.map(opt => (
+                  <button
+                    key={opt.label}
+                    onClick={() => { setChipDue(opt.value); setDueMenu(false) }}
+                    className="flex min-h-10 w-full cursor-pointer items-center px-3 text-left text-sm hover:bg-surface"
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </Popover>
 
               {/* Prioridade */}
-              <div className="relative">
-                <button
-                  onClick={() => { setPrioMenu(o => !o); setDueMenu(false) }}
-                  className={cn(
-                    'flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 text-[13px] font-medium transition-colors',
-                    effPriority < 4 ? '' : 'text-ink-muted',
-                  )}
-                  style={effPriority < 4 ? { color: `var(--priority-${effPriority}-text)` } : undefined}
-                >
-                  <Flag
-                    size={14}
-                    fill={effPriority < 4 ? PRIORITY_TINTS[effPriority] : 'none'}
-                    style={effPriority < 4 ? { color: PRIORITY_TINTS[effPriority] } : undefined}
-                  />
-                  {effPriority < 4 ? `P${effPriority}` : 'Prioridade'}
-                </button>
-                {prioMenu && (
-                  <div className="absolute bottom-full left-0 z-10 mb-1 w-44 rounded-xl border border-line bg-surface-elevated py-1 shadow-[var(--shadow-lg)]">
-                    {([1, 2, 3, 4] as Priority[]).map(p => (
-                      <button
-                        key={p}
-                        onClick={() => { setChipPriority(p); setPrioMenu(false) }}
-                        className="flex min-h-10 w-full cursor-pointer items-center gap-2.5 px-3 text-left text-sm hover:bg-surface"
-                      >
-                        <Flag size={15} fill={PRIORITY_TINTS[p]} style={{ color: PRIORITY_TINTS[p] }} />
-                        Prioridade {p}
-                        {effPriority === p && <Check size={14} className="ml-auto text-primary-ink" />}
-                      </button>
-                    ))}
-                  </div>
+              <Popover
+                open={prioMenu}
+                onClose={() => setPrioMenu(false)}
+                width={176}
+                trigger={ref => (
+                  <button
+                    ref={ref}
+                    onClick={() => { setPrioMenu(o => !o); setDueMenu(false) }}
+                    className={cn(
+                      'flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 text-[13px] font-medium transition-colors',
+                      effPriority < 4 ? '' : 'text-ink-muted',
+                    )}
+                    style={effPriority < 4 ? { color: `var(--priority-${effPriority}-text)` } : undefined}
+                  >
+                    <Flag
+                      size={14}
+                      fill={effPriority < 4 ? PRIORITY_TINTS[effPriority] : 'none'}
+                      style={effPriority < 4 ? { color: PRIORITY_TINTS[effPriority] } : undefined}
+                    />
+                    {effPriority < 4 ? `P${effPriority}` : 'Prioridade'}
+                  </button>
                 )}
-              </div>
+              >
+                {([1, 2, 3, 4] as Priority[]).map(p => (
+                  <button
+                    key={p}
+                    onClick={() => { setChipPriority(p); setPrioMenu(false) }}
+                    className="flex min-h-10 w-full cursor-pointer items-center gap-2.5 px-3 text-left text-sm hover:bg-surface"
+                  >
+                    <Flag size={15} fill={PRIORITY_TINTS[p]} style={{ color: PRIORITY_TINTS[p] }} />
+                    Prioridade {p}
+                    {effPriority === p && <Check size={14} className="ml-auto text-primary-ink" />}
+                  </button>
+                ))}
+              </Popover>
             </div>
 
             {/* Rodapé: projeto + enviar */}
