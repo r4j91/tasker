@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react'
-import { motion, useMotionValue, useTransform } from 'framer-motion'
-import { Calendar, Check, CalendarClock, GitFork, Tag } from 'lucide-react'
+import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
+import { Calendar, Check, CalendarClock, ChevronDown, GitFork, Tag } from 'lucide-react'
 import { format, addDays } from 'date-fns'
 import type { Task, Priority } from './types'
+import { useShallow } from 'zustand/react/shallow'
 import { useTaskStore } from '../../stores/useTaskStore'
 import { useUiStore } from '../../stores/useUiStore'
 import { Checkbox } from '../../components/ui/Checkbox'
@@ -28,9 +29,11 @@ interface TaskItemProps {
   hideProject?: boolean
   /** Desativa o toque longo de seleção (em contextos com drag próprio) */
   disableLongPress?: boolean
+  /** Linha de sub-tarefa aninhada (indentada, sem expandir as próprias) */
+  nested?: boolean
 }
 
-export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps) {
+export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskItemProps) {
   const toggleComplete = useTaskStore(s => s.toggleComplete)
   const completeMany = useTaskStore(s => s.completeMany)
   const updateTask = useTaskStore(s => s.updateTask)
@@ -51,6 +54,13 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
 
   const [scheduleOpen, setScheduleOpen] = useState(false)
   const [confirmSubtasks, setConfirmSubtasks] = useState(false)
+  /* Sub-tarefas aninhadas na lista (estilo Todoist) — expandidas por padrão */
+  const [subsOpen, setSubsOpen] = useState(true)
+  const subtasks = useTaskStore(
+    useShallow(s =>
+      nested ? [] : s.tasks.filter(t => t.parentId === task.id).sort((a, b) => a.order - b.order),
+    ),
+  )
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pressOrigin = useRef<{ x: number; y: number } | null>(null)
   const longPressFired = useRef(false)
@@ -164,8 +174,24 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
         onPointerUp={cancelLongPress}
         onPointerMove={maybeCancelLongPress}
         onPointerLeave={cancelLongPress}
-        className={cn('relative flex items-start gap-2 px-1', isTouch && 'touch-pan-y')}
+        className={cn('relative flex items-start gap-2 px-1', isTouch && 'touch-pan-y', nested && 'pl-8 md:pl-9')}
       >
+        {/* Chevron de sub-tarefas — só no pai, estilo Todoist */}
+        {subtasks.length > 0 && (
+          <button
+            onClick={() => setSubsOpen(o => !o)}
+            aria-label={subsOpen ? 'Recolher sub-tarefas' : 'Expandir sub-tarefas'}
+            className="mt-[9px] flex size-7 shrink-0 -ml-1 cursor-pointer items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-surface hover:text-ink"
+          >
+            <motion.span
+              animate={{ rotate: subsOpen ? 0 : -90 }}
+              transition={{ duration: 0.15 }}
+              className="flex"
+            >
+              <ChevronDown size={15} />
+            </motion.span>
+          </button>
+        )}
         <span className="mt-[13px] shrink-0">
           {selectionMode ? (
             <span
@@ -241,6 +267,25 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
           )}
         </button>
       </motion.div>
+
+      {/* Sub-tarefas aninhadas na lista */}
+      <AnimatePresence initial={false}>
+        {subtasks.length > 0 && subsOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="border-t border-line [&>div:last-child]:border-b-0">
+              {subtasks.map(sub => (
+                <TaskItem key={sub.id} task={sub} hideProject nested disableLongPress={disableLongPress} />
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Concluir a mãe com sub-tarefas pendentes */}
       <Modal

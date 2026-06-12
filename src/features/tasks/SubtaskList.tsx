@@ -5,6 +5,7 @@ import { useTaskStore } from '../../stores/useTaskStore'
 import { useUiStore } from '../../stores/useUiStore'
 import { Checkbox } from '../../components/ui/Checkbox'
 import { playCompleteSound } from '../../lib/sound'
+import { parseTask } from '../../lib/nlparse'
 import { cn } from '../../lib/cn'
 
 interface SubtaskListProps {
@@ -28,8 +29,17 @@ export function SubtaskList({ parentId }: SubtaskListProps) {
     .sort((a, b) => a.order - b.order)
 
   const submit = () => {
-    if (!title.trim()) return
-    addTask({ title, parentId })
+    const { projects, labels } = useTaskStore.getState()
+    const parsed = parseTask(title, projects, labels)
+    if (!parsed.title.trim()) return
+    addTask({
+      title: parsed.title,
+      parentId,
+      priority: parsed.priority,
+      dueDate: parsed.dueDate,
+      dueTime: parsed.dueTime,
+      labels: parsed.labelIds,
+    })
     setTitle('')
   }
 
