@@ -95,7 +95,7 @@ export function TaskDetailSheet() {
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={{ top: 0, bottom: 0.6 }}
             onDragEnd={(_, info) => { if (info.offset.y > 120) close() }}
-            className="relative flex max-h-[94dvh] flex-col rounded-t-2xl bg-canvas shadow-[var(--shadow-lg)]"
+            className="relative flex max-h-[94dvh] flex-col rounded-t-2xl bg-surface-elevated shadow-[var(--shadow-lg)]"
             style={{ height: '94dvh' }}
           >
             {/* Alça + fechar */}
