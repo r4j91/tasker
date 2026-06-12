@@ -345,7 +345,7 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
           >
             <div className="relative [&>div:last-child]:after:hidden">
               {/* Linha vertical da ramificação — alinhada ao checkbox do pai */}
-              <div className="pointer-events-none absolute bottom-5 left-[36px] top-0 w-px bg-line-strong opacity-60" aria-hidden />
+              <div className="pointer-events-none absolute bottom-[26px] left-[36px] top-0 w-px bg-line-strong opacity-60" aria-hidden />
               {subtasks.map(sub => (
                 <TaskItem key={sub.id} task={sub} hideProject nested disableLongPress={disableLongPress} />
               ))}

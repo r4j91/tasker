@@ -72,7 +72,7 @@ export function FiltersPage() {
               to={`/etiqueta/${l.id}`}
               className="flex min-h-[52px] w-full items-center gap-3 border-b border-line px-1 text-base transition-colors active:bg-surface md:text-sm"
             >
-              <Tag size={18} style={{ color: l.color }} fill={`${l.color}40`} />
+              <Tag size={18} style={{ color: l.color }} fill="none" />
               {l.name}
               <span className="ml-auto flex items-center gap-1 text-sm text-ink-faint">
                 {count > 0 && count}
