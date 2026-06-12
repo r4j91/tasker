@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -7,7 +7,7 @@ import { format, addDays } from 'date-fns'
 import { useUiStore } from '../stores/useUiStore'
 import { useTaskStore } from '../stores/useTaskStore'
 import { SmartInput } from '../features/tasks/SmartInput'
-import type { ParseResult } from '../lib/nlparse'
+import { parseTask, type ParseResult } from '../lib/nlparse'
 import type { Priority } from '../features/tasks/types'
 import { todayISO, dueLabel, dueColorVar } from '../lib/dates'
 import { useKeyboardInset } from '../lib/useKeyboardInset'
@@ -55,9 +55,20 @@ export function QuickAddSheet() {
   }
   const close = () => { reset(); setOpen(false) }
 
+  /* Esc fecha o sheet mesmo com o foco fora do input (ex.: após enviar) */
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
+
   const submit = () => {
-    const p = parsed
-    if (!p || !p.title.trim()) return
+    /* Parse na hora — o estado via efeito pode estar um tick atrasado */
+    const { projects: projs, labels } = useTaskStore.getState()
+    const p = parseTask(title, projs, labels)
+    if (!p.title.trim()) return
     const store = useTaskStore.getState()
     store.addTask({
       title: p.title,

@@ -4,7 +4,7 @@ import { Plus } from 'lucide-react'
 import { useTaskStore } from '../../stores/useTaskStore'
 import { useUiStore } from '../../stores/useUiStore'
 import { SmartInput } from './SmartInput'
-import type { ParseResult } from '../../lib/nlparse'
+import { parseTask, type ParseResult } from '../../lib/nlparse'
 
 const isMobile = () => window.matchMedia('(max-width: 767px)').matches
 
@@ -45,8 +45,9 @@ export function QuickAdd({ projectId = null, dueDate = null }: QuickAddProps) {
   }, [])
 
   const submit = () => {
-    const parsed = parsedRef.current
-    if (!parsed || !parsed.title.trim()) return
+    const { projects, labels } = useTaskStore.getState()
+    const parsed = parseTask(title, projects, labels)
+    if (!parsed.title.trim()) return
     addTask({
       title: parsed.title,
       dueDate: parsed.dueDate ?? dueDate,

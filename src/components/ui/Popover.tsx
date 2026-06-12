@@ -34,7 +34,9 @@ export function Popover({ open, onClose, trigger, children, width = 224 }: Popov
     middleware: [offset(6), flip({ padding: 12 }), shift({ padding: 12 })],
   })
 
-  const dismiss = useDismiss(context, { outsidePress: true, escapeKey: true })
+  /* No mobile a ref flutuante nunca é anexada — sem o gate, qualquer
+     pointerdown contaria como "fora" e fecharia antes do clique chegar */
+  const dismiss = useDismiss(context, { outsidePress: true, escapeKey: true, enabled: isDesktop })
   const { getFloatingProps } = useInteractions([dismiss])
 
   /* Esc no mobile (sheet) */
