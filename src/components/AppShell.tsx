@@ -129,7 +129,7 @@ export function AppShell() {
         >
           <Search size={14} />
           Buscar...
-          <kbd className="ml-auto rounded border border-line bg-surface px-1.5 py-0.5 text-[10px]">⌘K</kbd>
+          <kbd className="ml-auto rounded border border-line bg-surface px-1.5 py-0.5 text-xs">⌘K</kbd>
         </button>
 
         <nav className="flex flex-col gap-0.5">
@@ -154,7 +154,7 @@ export function AppShell() {
         </nav>
 
         <div className="mt-7 mb-1.5 flex items-center justify-between px-3">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-faint">
+          <span className="text-xs font-semibold uppercase tracking-[0.08em] text-ink-faint">
             Projetos
           </span>
           <button
@@ -180,7 +180,7 @@ export function AppShell() {
 
         {/* ── Etiquetas ── */}
         <div className="mt-7 mb-1.5 flex items-center justify-between px-3">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-faint">
+          <span className="text-xs font-semibold uppercase tracking-[0.08em] text-ink-faint">
             Etiquetas
           </span>
           <button

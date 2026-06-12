@@ -68,7 +68,7 @@ export function DesignSystem() {
               ['Caption', 'text-xs text-ink-faint',                     'seg, 9 de jun · 14:30'],
             ] as const).map(([lbl, cls, txt]) => (
               <div key={lbl} className="flex items-baseline gap-4">
-                <span className="w-14 shrink-0 text-[11px] uppercase tracking-wide text-ink-faint">{lbl}</span>
+                <span className="w-14 shrink-0 text-xs uppercase tracking-wide text-ink-faint">{lbl}</span>
                 <span className={cls}>{txt}</span>
               </div>
             ))}
@@ -175,7 +175,7 @@ export function DesignSystem() {
 function Section({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
   return (
     <section className="mb-12">
-      <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-faint">
+      <h2 className="mb-1 text-xs font-semibold uppercase tracking-[0.08em] text-ink-faint">
         {title}
       </h2>
       {subtitle && <p className="mb-4 text-sm text-ink-muted">{subtitle}</p>}

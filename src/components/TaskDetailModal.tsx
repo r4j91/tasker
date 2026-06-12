@@ -265,7 +265,7 @@ export function TaskDetailModal() {
                   ))}
                   {taskSections.length > 0 && (
                     <>
-                      <p className="border-t border-line px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
+                      <p className="border-t border-line px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-ink-muted">
                         Seção
                       </p>
                       <PopoverItem onClick={() => { updateTask(task.id, { sectionId: null }); closePopover() }}>
@@ -474,7 +474,7 @@ function Field({ label, value, open, onToggle, onClose, children, wide }: {
             onClick={onToggle}
             className="w-full cursor-pointer rounded-lg px-2 py-2 text-left transition-colors hover:bg-surface"
           >
-            <span className="block text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
+            <span className="block text-xs font-semibold uppercase tracking-wide text-ink-muted">
               {label}
             </span>
             <span className="mt-1 block text-sm">{value}</span>

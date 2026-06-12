@@ -99,7 +99,7 @@ export function QuickAdd({ projectId = null, dueDate = null }: QuickAddProps) {
               <Plus size={15} />
             </span>
             Adicionar tarefa
-            <kbd className="ml-auto hidden rounded border border-line bg-surface px-1.5 py-0.5 text-[10px] font-medium text-ink-faint md:inline">
+            <kbd className="ml-auto hidden rounded border border-line bg-surface px-1.5 py-0.5 text-xs font-medium text-ink-faint md:inline">
               Q
             </kbd>
           </motion.button>

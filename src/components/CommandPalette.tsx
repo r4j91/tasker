@@ -155,7 +155,7 @@ function PaletteContent({ onClose }: { onClose: () => void }) {
           placeholder="Buscar tarefas, projetos ou ações..."
           className="h-12 w-full bg-transparent text-sm outline-none placeholder:text-ink-faint"
         />
-        <kbd className="shrink-0 rounded border border-line bg-surface px-1.5 py-0.5 text-[10px] text-ink-faint">esc</kbd>
+        <kbd className="shrink-0 rounded border border-line bg-surface px-1.5 py-0.5 text-xs text-ink-faint">esc</kbd>
       </div>
 
       <div ref={listRef} className="max-h-72 overflow-y-auto p-1.5">
@@ -179,7 +179,7 @@ function PaletteContent({ onClose }: { onClose: () => void }) {
               )}
               <span className="truncate">{item.label}</span>
               {item.hint && (
-                <span className="ml-auto shrink-0 text-[11px] text-ink-faint">{item.hint}</span>
+                <span className="ml-auto shrink-0 text-xs text-ink-faint">{item.hint}</span>
               )}
             </button>
           ))
