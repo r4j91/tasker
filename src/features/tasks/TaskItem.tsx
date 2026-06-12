@@ -169,6 +169,7 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
         'relative after:absolute after:bottom-0 after:right-0 after:h-px after:bg-line',
         nested ? 'after:left-[62px]' : subtasks.length > 0 ? 'after:left-9' : 'after:left-1',
       )}
+      style={project && !nested ? { borderLeft: `3px solid ${project.color}` } : undefined}
     >
       {/* Fundos revelados pelo swipe (apenas touch) */}
       {isTouch && (
@@ -290,13 +291,13 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
               {subtaskTotal > 0 && (
                 <span className="flex items-center gap-1 text-ink-faint">
                   <SubtaskIcon />
-                  <span className="tabular-nums">
+                  <span className="data-mono">
                     <RollingNumber value={subtaskDone} />/{subtaskTotal}
                   </span>
                 </span>
               )}
               {due && (
-                <span className="flex items-center gap-1 tabular-nums" style={{ color: dueColorVar(due) }}>
+                <span className="data-mono flex items-center gap-1" style={{ color: dueColorVar(due) }}>
                   <Calendar size={12} />
                   {dueLabel(due)}{task.dueTime && ` ${task.dueTime}`}
                 </span>

@@ -146,7 +146,25 @@
   --color-done:             var(--done);
   --color-done-bg:          var(--done-bg);
 
-  --font-sans: 'Inter Variable', system-ui, sans-serif;
+  --font-sans:    'Inter Variable', system-ui, sans-serif;
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* ─── Tipografia de exibição (Instrument Serif itálico) ─────────────── */
+.display-title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* Dados temporais (datas, horas, contadores) em mono */
+.data-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }
 
 /* ─── Base ──────────────────────────────────────────────────────────── */

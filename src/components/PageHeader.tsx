@@ -10,8 +10,8 @@ export function PageHeader({ title, subtitle, accessory }: PageHeaderProps) {
   return (
     <div className="mb-6 flex items-end justify-between">
       <div>
-        <h1 className="text-balance text-[28px] font-bold tracking-[-0.02em] md:text-2xl">{title}</h1>
-        {subtitle && <p className="mt-0.5 text-sm text-ink-muted">{subtitle}</p>}
+        <h1 className="display-title text-[32px] md:text-[28px] text-ink">{title}</h1>
+        {subtitle && <p className="data-mono mt-1.5 text-[11px] uppercase tracking-[0.06em] text-ink-faint">{subtitle}</p>}
       </div>
       {accessory}
     </div>

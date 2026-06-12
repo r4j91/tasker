@@ -137,7 +137,7 @@ export function AppShell() {
       {/* ── Sidebar (desktop) ── */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-line bg-surface/60 px-3 pt-5 pb-4 md:flex">
         <div className="mb-6 flex items-center justify-between px-3">
-          <span className="text-[15px] font-bold tracking-tight">TASKER</span>
+          <span className="display-title text-[18px] text-ink">Tasker</span>
           <button
             onClick={onToggleTheme}
             aria-label="Alternar tema"

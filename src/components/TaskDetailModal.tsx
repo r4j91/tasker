@@ -185,7 +185,7 @@ export function TaskDetailModal() {
                     value={task.title}
                     onChange={e => updateTask(task.id, { title: e.target.value })}
                     className={cn(
-                      'w-full border-0 bg-transparent text-xl font-semibold leading-7 focus:outline-none focus-visible:outline-none',
+                      'display-title w-full border-0 bg-transparent text-[26px] leading-[1.2] focus:outline-none focus-visible:outline-none',
                       task.completed && 'text-ink-faint line-through',
                     )}
                   />
@@ -309,7 +309,7 @@ export function TaskDetailModal() {
                   onClose={closePopover}
                   value={
                     task.dueDate ? (
-                      <span className="flex items-center gap-1.5" style={{ color: dueColorVar(task.dueDate) }}>
+                      <span className="data-mono flex items-center gap-1.5" style={{ color: dueColorVar(task.dueDate) }}>
                         <Calendar size={14} />
                         {dueLabel(task.dueDate)}{task.dueTime && ` ${task.dueTime}`}
                       </span>
