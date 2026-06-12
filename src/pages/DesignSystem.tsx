@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
-import { Sun, Moon, Search, Mail } from 'lucide-react'
+import { Sun, Moon, Search, Mail, Flag, Calendar, Tag as TagIcon } from 'lucide-react'
 import { Button, Input, Checkbox, Modal, Tooltip, Tag } from '../components/ui'
+import { LABEL_COLORS } from '../features/tasks/types'
 
 import { useUiStore } from '../stores/useUiStore'
 
@@ -110,6 +111,60 @@ export function DesignSystem() {
             <Checkbox checked={checks.b} onChange={() => toggle('b')} label="Responder e-mail do cliente" />
             <Checkbox checked={checks.c} onChange={() => toggle('c')} label="Fazer backup do projeto" />
             <Checkbox checked={false} onChange={() => {}} label="Tarefa desativada" disabled />
+          </div>
+        </Section>
+
+        <Section title="Prioridades" subtitle="Gráficos vivos; texto pequeno usa as variantes -text (≥4.5:1).">
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-5">
+              {[1, 2, 3].map(p => (
+                <span key={p} className="flex items-center gap-1.5" style={{ color: `var(--priority-${p}-text)` }}>
+                  <Flag size={15} fill={`var(--priority-${p})`} style={{ color: `var(--priority-${p})` }} />
+                  P{p}
+                </span>
+              ))}
+              <span className="flex items-center gap-1.5 text-ink-muted">
+                <Flag size={15} /> P4
+              </span>
+            </div>
+            <div className="flex items-center gap-6">
+              <Checkbox checked={false} onChange={() => {}} tint="var(--priority-1)" className="w-auto min-h-0 py-0" />
+              <Checkbox checked={false} onChange={() => {}} tint="var(--priority-2)" className="w-auto min-h-0 py-0" />
+              <Checkbox checked={false} onChange={() => {}} tint="var(--priority-3)" className="w-auto min-h-0 py-0" />
+              <Checkbox checked={false} onChange={() => {}} className="w-auto min-h-0 py-0" />
+              <span className="text-xs text-ink-muted">círculo carrega a cor da prioridade</span>
+            </div>
+          </div>
+        </Section>
+
+        <Section title="Datas" subtitle="Semântica Todoist — hoje verde, atrasada vermelha, amanhã âmbar, futuro roxo.">
+          <div className="flex flex-wrap items-center gap-5 text-sm">
+            {([
+              ['Hoje', '--date-today'],
+              ['Atrasada', '--date-overdue'],
+              ['Amanhã', '--date-tomorrow'],
+              ['Futuro', '--date-future'],
+            ] as const).map(([lbl, token]) => (
+              <span key={lbl} className="flex items-center gap-1.5" style={{ color: `var(${token})` }}>
+                <Calendar size={14} /> {lbl}
+              </span>
+            ))}
+          </div>
+        </Section>
+
+        <Section title="Etiquetas" subtitle="Paleta de 20 cores (Todoist) — bolinha colorida + texto em tinta.">
+          <div className="mb-4 flex flex-wrap gap-1.5">
+            {LABEL_COLORS.map(c => (
+              <span key={c.hex} title={c.name} className="size-6 rounded-full" style={{ background: c.hex }} />
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-3 text-[13px]">
+            {LABEL_COLORS.slice(0, 4).map(c => (
+              <span key={c.hex} className="flex items-center gap-1.5 text-ink-muted">
+                <TagIcon size={12} style={{ color: c.hex }} fill={`${c.hex}40`} />
+                {c.name.toLowerCase()}
+              </span>
+            ))}
           </div>
         </Section>
 
