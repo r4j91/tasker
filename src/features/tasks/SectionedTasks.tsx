@@ -237,6 +237,7 @@ function SectionBlock({ section, tasks, canMoveUp, canMoveDown }: {
 
         <button
           onClick={() => updateSection(section.id, { collapsed: !section.collapsed })}
+          aria-expanded={!section.collapsed}
           aria-label={section.collapsed ? 'Expandir seção' : 'Recolher seção'}
           className="flex size-11 cursor-pointer items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-surface hover:text-ink md:size-6"
         >

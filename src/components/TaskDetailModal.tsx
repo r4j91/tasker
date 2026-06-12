@@ -439,7 +439,7 @@ export function TaskDetailModal() {
               </div>
 
               <p className="shrink-0 border-t border-line px-4 py-2.5 text-xs text-ink-muted">
-                Criada em {format(parseISO(task.createdAt), "d 'de' MMM 'de' yyyy", { locale: ptBR })}
+                Criada em {format(parseISO(task.createdAt), "d 'de' MMMM 'de' yyyy", { locale: ptBR })}
               </p>
             </aside>
           </motion.div>

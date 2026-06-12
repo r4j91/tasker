@@ -24,6 +24,7 @@ export function CompletedSection({ tasks, hideProject }: CompletedSectionProps) 
     <div className="mt-8">
       <button
         onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
         className="flex min-h-11 cursor-pointer items-center gap-1.5 rounded-lg px-2 text-[13px] font-medium text-ink-faint transition-colors hover:text-ink-muted"
       >
         <motion.span

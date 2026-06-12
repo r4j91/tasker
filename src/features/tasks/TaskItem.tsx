@@ -177,6 +177,7 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
         {subtasks.length > 0 && (
           <button
             onClick={() => setSubsOpen(o => !o)}
+            aria-expanded={subsOpen}
             aria-label={subsOpen ? 'Recolher sub-tarefas' : 'Expandir sub-tarefas'}
             className="mt-[9px] flex size-7 shrink-0 -ml-1 cursor-pointer items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-surface hover:text-ink"
           >
