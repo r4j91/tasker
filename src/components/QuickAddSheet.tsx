@@ -220,7 +220,7 @@ export function QuickAddSheet() {
                   onChange={e => setChipProject(e.target.value || null)}
                   className="max-w-40 cursor-pointer truncate bg-transparent text-sm font-medium text-ink outline-none"
                 >
-                  <option value="">Entrada</option>
+                  <option value="">Caixa de entrada</option>
                   {projects.map(p => (
                     <option key={p.id} value={p.id}>{p.name}</option>
                   ))}

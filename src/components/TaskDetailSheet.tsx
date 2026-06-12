@@ -162,7 +162,7 @@ export function TaskDetailSheet() {
                     onChange={e => updateTask(task.id, { projectId: e.target.value || null, sectionId: null })}
                     className="max-w-44 cursor-pointer truncate bg-transparent font-medium outline-none"
                   >
-                    <option value="">Entrada</option>
+                    <option value="">Caixa de entrada</option>
                     {projects.map(p => (
                       <option key={p.id} value={p.id}>{p.name}</option>
                     ))}
