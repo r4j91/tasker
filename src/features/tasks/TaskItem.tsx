@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { motion, AnimatePresence, useMotionValue, useTransform, useReducedMotion } from 'framer-motion'
-import { Calendar, Check, CalendarClock, ChevronDown, GitFork, Tag } from 'lucide-react'
+import { Calendar, Check, CalendarClock, ChevronDown, Tag } from 'lucide-react'
 import { format, addDays } from 'date-fns'
 import type { Task, Priority } from './types'
 import { useShallow } from 'zustand/react/shallow'
@@ -22,6 +22,20 @@ const PRIORITY_META: Record<Priority, { label: string; tint?: string }> = {
 }
 
 const isTouch = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+
+/* Ícone de sub-tarefas estilo Todoist: nó-mãe ramificando para o filho */
+function SubtaskIcon({ size = 12 }: { size?: number }) {
+  return (
+    <svg
+      width={size} height={size} viewBox="0 0 16 16" fill="none"
+      stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden
+    >
+      <circle cx="4.5" cy="4" r="2.3" />
+      <path d="M4.5 6.3V9a3 3 0 0 0 3 3h1.2" />
+      <circle cx="11" cy="12" r="2.3" />
+    </svg>
+  )
+}
 
 const SWIPE_THRESHOLD = 90
 
@@ -146,15 +160,7 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
   ]
 
   return (
-    <div
-      className={cn(
-        'relative border-b border-line transition-colors',
-        'md:hover:bg-surface/60',
-        /* Feedback transitório de toque — só enquanto o dedo pressiona a linha */
-        'has-[[data-row-main]:active]:bg-surface/60',
-        selected && 'bg-surface',
-      )}
-    >
+    <div className="relative border-b border-line">
       {/* Fundos revelados pelo swipe (apenas touch) */}
       {isTouch && (
         <>
@@ -185,7 +191,16 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
         onPointerUp={cancelLongPress}
         onPointerMove={maybeCancelLongPress}
         onPointerLeave={cancelLongPress}
-        className={cn('relative flex items-start gap-2 px-1', isTouch && 'touch-pan-y', nested && 'pl-8 md:pl-9')}
+        className={cn(
+          'relative flex items-start gap-2 px-1 transition-colors',
+          'md:hover:bg-surface/50',
+          /* Feedback transitório de toque — só enquanto o dedo pressiona a linha */
+          'has-[[data-row-main]:active]:bg-surface/60',
+          selected && 'bg-surface',
+          isTouch && 'touch-pan-y',
+          /* Sub-tarefa alinha o checkbox sob o TÍTULO da mãe (estilo Todoist) */
+          nested && 'pl-[62px]',
+        )}
       >
         {/* Chevron de sub-tarefas — só no pai, estilo Todoist */}
         {subtasks.length > 0 && (
@@ -259,7 +274,7 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
             <span className="flex w-full flex-wrap items-center gap-2 text-[13px] md:text-xs">
               {subtaskTotal > 0 && (
                 <span className="flex items-center gap-1 text-ink-faint">
-                  <GitFork size={12} className="rotate-180" />
+                  <SubtaskIcon />
                   <span className="tabular-nums">
                     <RollingNumber value={subtaskDone} />/{subtaskTotal}
                   </span>
@@ -300,7 +315,7 @@ export function TaskItem({ task, hideProject, disableLongPress, nested }: TaskIt
           >
             <div className="relative border-t border-line [&>div:last-child]:border-b-0">
               {/* Linha-guia vertical conectando as sub-tarefas à mãe */}
-              <span aria-hidden className="absolute bottom-2 left-[18px] top-2 w-px bg-line md:left-5" />
+              <span aria-hidden className="absolute bottom-2 left-[44px] top-2 w-px bg-line" />
               {subtasks.map(sub => (
                 <TaskItem key={sub.id} task={sub} hideProject nested disableLongPress={disableLongPress} />
               ))}
