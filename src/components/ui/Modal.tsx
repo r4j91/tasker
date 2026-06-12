@@ -1,8 +1,9 @@
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import { cn } from '../../lib/cn'
+import { useFocusTrap } from '../../lib/useFocusTrap'
 
 interface ModalProps {
   open: boolean
@@ -13,6 +14,9 @@ interface ModalProps {
 }
 
 export function Modal({ open, onClose, title, children, className }: ModalProps) {
+  const panelRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(panelRef, open)
+
   useEffect(() => {
     if (!open) return
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
@@ -40,6 +44,7 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
 
           {/* Painel */}
           <motion.div
+            ref={panelRef}
             role="dialog"
             aria-modal="true"
             aria-label={title}

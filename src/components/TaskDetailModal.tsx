@@ -13,6 +13,7 @@ import { Popover } from './ui/Popover'
 import { SubtaskList } from '../features/tasks/SubtaskList'
 import { playCompleteSound } from '../lib/sound'
 import { todayISO, dueLabel, dueColorVar } from '../lib/dates'
+import { useFocusTrap } from '../lib/useFocusTrap'
 import type { Priority } from '../features/tasks/types'
 import { cn } from '../lib/cn'
 
@@ -39,6 +40,7 @@ export function TaskDetailModal() {
   const duplicateTask = useTaskStore(s => s.duplicateTask)
   const addLabel = useTaskStore(s => s.addLabel)
 
+  const panelRef = useRef<HTMLDivElement>(null)
   const [popover, setPopover] = useState<PopoverKind>(null)
   const [labelQuery, setLabelQuery] = useState('')
   /* Esc/clique-fora que fecharam um popover não podem fechar o modal junto */
@@ -50,6 +52,8 @@ export function TaskDetailModal() {
     if (Date.now() - popGuard.current < 250) return
     close()
   }
+
+  useFocusTrap(panelRef, !!task)
 
   /* Esc fecha popover primeiro, depois o painel */
   useEffect(() => {
@@ -123,6 +127,7 @@ export function TaskDetailModal() {
           />
 
           <motion.div
+            ref={panelRef}
             role="dialog" aria-modal="true" aria-label={task.title}
             initial={{ opacity: 0, scale: 0.97, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
