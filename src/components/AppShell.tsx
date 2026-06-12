@@ -16,6 +16,8 @@ import { ShortcutsModal } from './ShortcutsModal'
 import { MobileNav } from './MobileNav'
 import { QuickAddSheet } from './QuickAddSheet'
 import { TaskDetailSheet } from './TaskDetailSheet'
+import { TaskDetailModal } from './TaskDetailModal'
+import { useMediaQuery } from '../lib/useMediaQuery'
 import { LabelEditModal } from '../features/labels/LabelEditModal'
 import { cn } from '../lib/cn'
 
@@ -37,6 +39,7 @@ export function AppShell() {
   const addProject = useTaskStore(s => s.addProject)
   const navigate = useNavigate()
 
+  const isDesktop = useMediaQuery('(min-width: 768px)')
   const [newProjectOpen, setNewProjectOpen] = useState(false)
   const [newLabelOpen, setNewLabelOpen] = useState(false)
   const [projectName, setProjectName] = useState('')
@@ -58,7 +61,7 @@ export function AppShell() {
         case 'ArrowUp':
           e.preventDefault(); ui.moveSelection(-1); break
         case 'Enter':
-          if (ui.selectedId) { e.preventDefault(); ui.toggleExpanded(ui.selectedId) }
+          if (ui.selectedId) { e.preventDefault(); ui.setDetailTask(ui.selectedId) }
           break
         case 'e': case 'E': {
           if (!ui.selectedId) break
@@ -82,7 +85,7 @@ export function AppShell() {
         case 'Escape':
           /* Com modal/sheet aberto, o Escape pertence a ele */
           if (document.querySelector('[role="dialog"]')) break
-          if (ui.expandedId) ui.setExpanded(null)
+          if (ui.detailTaskId) ui.setDetailTask(null)
           else if (ui.selectedId) ui.setSelected(null)
           break
       }
@@ -250,7 +253,7 @@ export function AppShell() {
       <CommandPalette />
       <ShortcutsModal />
       <QuickAddSheet />
-      <TaskDetailSheet />
+      {isDesktop ? <TaskDetailModal /> : <TaskDetailSheet />}
       <LabelEditModal open={newLabelOpen} onClose={() => setNewLabelOpen(false)} />
     </div>
   )

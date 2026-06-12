@@ -64,7 +64,7 @@ function PaletteContent({ onClose }: { onClose: () => void }) {
   const setShortcutsOpen = useUiStore(s => s.setShortcutsOpen)
   const soundEnabled = useUiStore(s => s.soundEnabled)
   const setSoundEnabled = useUiStore(s => s.setSoundEnabled)
-  const setExpanded = useUiStore(s => s.setExpanded)
+  const setDetailTask = useUiStore(s => s.setDetailTask)
 
   const tasks = useTaskStore(s => s.tasks)
   const projects = useTaskStore(s => s.projects)
@@ -112,7 +112,7 @@ function PaletteContent({ onClose }: { onClose: () => void }) {
             hint: 'Tarefa',
             run: () => {
               navigate(t.projectId ? `/projeto/${t.projectId}` : '/')
-              setExpanded(t.id)
+              setDetailTask(t.id)
               onClose()
             },
           }))

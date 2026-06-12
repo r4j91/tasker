@@ -154,12 +154,9 @@ function TaskContainer({ sectionId, tasks }: { sectionId: string | null; tasks: 
 }
 
 function SortableTaskRow({ task }: { task: Task }) {
-  /* Expandida: desativa o drag da linha para não conflitar com o reorder das sub-tarefas */
-  const expanded = useUiStore(s => s.expandedId === task.id)
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
     data: { type: 'task' },
-    disabled: expanded,
   })
 
   return (

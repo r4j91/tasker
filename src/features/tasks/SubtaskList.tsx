@@ -98,7 +98,7 @@ export function SubtaskList({ parentId }: SubtaskListProps) {
           onChange={e => setTitle(e.target.value)}
           onKeyDown={e => {
             if (e.key === 'Enter') submit()
-            if (e.key === 'Escape') { setTitle(''); setAdding(false) }
+            if (e.key === 'Escape') { e.stopPropagation(); setTitle(''); setAdding(false) }
           }}
           onBlur={() => { if (!title.trim()) setAdding(false) }}
           autoFocus

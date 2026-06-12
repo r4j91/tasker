@@ -29,6 +29,8 @@ interface TaskStore {
   toggleComplete: (id: string) => void
   completeMany: (ids: string[]) => void
   deleteTask: (id: string) => void
+  /** Duplica a tarefa (e suas sub-tarefas) */
+  duplicateTask: (id: string) => void
   deleteMany: (ids: string[]) => void
   undoDelete: () => void
   reorderTasks: (ids: string[]) => void
@@ -114,6 +116,33 @@ export const useTaskStore = create<TaskStore>()(
       },
 
       deleteTask: (id) => get().deleteMany([id]),
+
+      duplicateTask: (id) => {
+        const { tasks } = get()
+        const original = tasks.find(t => t.id === id)
+        if (!original) return
+        const copyId = crypto.randomUUID()
+        const topOrder = Math.min(0, ...tasks.map(t => t.order)) - 1
+        const copy: Task = {
+          ...original,
+          id: copyId,
+          completed: false,
+          completedAt: null,
+          order: topOrder,
+          createdAt: new Date().toISOString(),
+        }
+        const subCopies: Task[] = tasks
+          .filter(t => t.parentId === id)
+          .map(sub => ({
+            ...sub,
+            id: crypto.randomUUID(),
+            parentId: copyId,
+            completed: false,
+            completedAt: null,
+            createdAt: new Date().toISOString(),
+          }))
+        set(s => ({ tasks: [copy, ...subCopies, ...s.tasks] }))
+      },
 
       deleteMany: (ids) => {
         const { tasks, pendingDelete } = get()

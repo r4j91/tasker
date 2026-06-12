@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
-import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
-import { Calendar, Trash2, FolderOpen, Check, CalendarClock, Rows3, GitFork, Tag } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { motion, useMotionValue, useTransform } from 'framer-motion'
+import { Calendar, Check, CalendarClock, GitFork, Tag } from 'lucide-react'
 import { format, addDays } from 'date-fns'
 import type { Task, Priority } from './types'
 import { useTaskStore } from '../../stores/useTaskStore'
@@ -8,8 +8,6 @@ import { useUiStore } from '../../stores/useUiStore'
 import { Checkbox } from '../../components/ui/Checkbox'
 import { Button } from '../../components/ui/Button'
 import { Modal } from '../../components/ui/Modal'
-import { SubtaskList } from './SubtaskList'
-import { LabelPickerModal } from '../labels/LabelPickerModal'
 import { dueLabel, isOverdue, isDueToday, todayISO } from '../../lib/dates'
 import { playCompleteSound } from '../../lib/sound'
 import { cn } from '../../lib/cn'
@@ -36,18 +34,15 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
   const toggleComplete = useTaskStore(s => s.toggleComplete)
   const completeMany = useTaskStore(s => s.completeMany)
   const updateTask = useTaskStore(s => s.updateTask)
-  const deleteTask = useTaskStore(s => s.deleteTask)
   const projects = useTaskStore(s => s.projects)
-  const sections = useTaskStore(s => s.sections)
   const allLabels = useTaskStore(s => s.labels)
   /* Contagens primitivas — evita re-render por identidade de array */
   const subtaskTotal = useTaskStore(s => s.tasks.reduce((n, t) => (t.parentId === task.id ? n + 1 : n), 0))
   const subtaskDone = useTaskStore(s => s.tasks.reduce((n, t) => (t.parentId === task.id && t.completed ? n + 1 : n), 0))
 
-  const expanded = useUiStore(s => s.expandedId === task.id)
   const selected = useUiStore(s => s.selectedId === task.id)
-  const toggleExpanded = useUiStore(s => s.toggleExpanded)
   const setSelected = useUiStore(s => s.setSelected)
+  const setDetailTask = useUiStore(s => s.setDetailTask)
   const soundEnabled = useUiStore(s => s.soundEnabled)
   const selectionMode = useUiStore(s => s.selectionMode)
   const isChecked = useUiStore(s => s.checkedIds.includes(task.id))
@@ -55,36 +50,14 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
   const toggleChecked = useUiStore(s => s.toggleChecked)
 
   const [scheduleOpen, setScheduleOpen] = useState(false)
-  const [labelsOpen, setLabelsOpen] = useState(false)
+  const [confirmSubtasks, setConfirmSubtasks] = useState(false)
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pressOrigin = useRef<{ x: number; y: number } | null>(null)
+  const longPressFired = useRef(false)
 
   const taskLabels = task.labels
     .map(id => allLabels.find(l => l.id === id))
     .filter((l): l is NonNullable<typeof l> => !!l)
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const pressOrigin = useRef<{ x: number; y: number } | null>(null)
-  const longPressFired = useRef(false)
-  const rootRef = useRef<HTMLDivElement>(null)
-
-  /* Clicar fora da tarefa expandida recolhe a edição.
-     Usa o evento click (após o mouseup) — recolher no pointerdown faria o
-     conteúdo deslizar sob o cursor e o mouseup acertar botões errados. */
-  useEffect(() => {
-    if (!expanded) return
-    const onClick = (e: MouseEvent) => {
-      /* Outra tarefa pode ter sido expandida por este mesmo clique */
-      if (useUiStore.getState().expandedId !== task.id) return
-      const target = e.target as Node
-      /* O clique pode ter removido o alvo do DOM (ex.: botão que vira input) —
-         nesse caso não dá para saber se foi fora; não recolher */
-      if (!target.isConnected) return
-      if (rootRef.current?.contains(target)) return
-      /* Cliques em modais/popovers (portais no body) não recolhem */
-      if ((target as HTMLElement).closest?.('[role="dialog"]')) return
-      useUiStore.getState().setExpanded(null)
-    }
-    document.addEventListener('click', onClick)
-    return () => document.removeEventListener('click', onClick)
-  }, [expanded, task.id])
 
   /* Toque longo (450ms) entra em modo seleção — apenas touch, tarefas ativas */
   const startLongPress = (e: React.PointerEvent) => {
@@ -114,15 +87,10 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
   const leftHint = useTransform(x, [-SWIPE_THRESHOLD, 0], [1, 0])
 
   const project = projects.find(p => p.id === task.projectId)
-  const taskSections = task.projectId
-    ? sections.filter(s => s.projectId === task.projectId).sort((a, b) => a.order - b.order)
-    : []
   const due = task.dueDate
   const dueTone = due
     ? isOverdue(due) ? 'text-overdue' : isDueToday(due) ? 'text-today' : 'text-ink-muted'
     : ''
-
-  const [confirmSubtasks, setConfirmSubtasks] = useState(false)
 
   const complete = () => {
     /* Concluir a mãe com sub-tarefas pendentes pergunta antes */
@@ -161,14 +129,13 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
 
   return (
     <div
-      ref={rootRef}
       className={cn(
         'relative border-b border-line transition-colors',
-        selected && !expanded && 'bg-surface',
+        selected && 'bg-surface',
       )}
     >
       {/* Fundos revelados pelo swipe (apenas touch) */}
-      {isTouch && !expanded && (
+      {isTouch && (
         <>
           <motion.div
             style={{ opacity: rightHint }}
@@ -187,7 +154,7 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
 
       {/* Linha principal (arrastável no touch) */}
       <motion.div
-        drag={isTouch && !expanded && !selectionMode ? 'x' : false}
+        drag={isTouch && !selectionMode ? 'x' : false}
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.6}
         dragDirectionLock
@@ -228,12 +195,7 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
             if (longPressFired.current) { longPressFired.current = false; return }
             if (selectionMode) { toggleChecked(task.id); return }
             setSelected(task.id)
-            /* Mobile: detalhe em bottom sheet (padrão Todoist) */
-            if (window.matchMedia('(max-width: 767px)').matches) {
-              useUiStore.getState().setDetailTask(task.id)
-              return
-            }
-            toggleExpanded(task.id)
+            setDetailTask(task.id)
           }}
           className="flex min-h-12 min-w-0 flex-1 cursor-pointer flex-col justify-center gap-0.5 py-3 text-left"
         >
@@ -242,7 +204,7 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
           </span>
 
           {/* Prévia da descrição (primeira linha) */}
-          {task.notes.trim() && !expanded && (
+          {task.notes.trim() && (
             <span className="truncate text-[13px] text-ink-muted md:text-xs">
               {task.notes.trim().split('\n')[0]}
             </span>
@@ -279,127 +241,6 @@ export function TaskItem({ task, hideProject, disableLongPress }: TaskItemProps)
           )}
         </button>
       </motion.div>
-
-      {/* Edição inline */}
-      <AnimatePresence initial={false}>
-        {expanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="overflow-hidden"
-          >
-            <div className="space-y-3 px-3 pb-3 pt-1">
-              <textarea
-                value={task.notes}
-                onChange={e => updateTask(task.id, { notes: e.target.value })}
-                placeholder="Notas..."
-                rows={2}
-                className="w-full resize-none rounded-lg border border-line bg-canvas px-3 py-2 text-sm placeholder:text-ink-faint focus:border-primary focus:outline-none"
-              />
-
-              {/* Sub-tarefas */}
-              <SubtaskList parentId={task.id} />
-
-              <div className="flex flex-wrap items-center gap-2">
-                <label className="flex h-11 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 text-[13px] text-ink-muted transition-colors hover:border-line-strong md:h-8 md:px-2.5 md:text-xs">
-                  <Calendar size={14} />
-                  <input
-                    type="date"
-                    lang="pt-BR"
-                    value={task.dueDate ?? ''}
-                    onChange={e => updateTask(task.id, { dueDate: e.target.value || null })}
-                    className="h-full cursor-pointer bg-transparent text-[13px] text-ink outline-none md:text-xs"
-                  />
-                </label>
-
-                <label className="flex h-11 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 text-[13px] text-ink-muted transition-colors hover:border-line-strong md:h-8 md:px-2.5 md:text-xs">
-                  <CalendarClock size={14} />
-                  <input
-                    type="time"
-                    lang="pt-BR"
-                    value={task.dueTime ?? ''}
-                    onChange={e => updateTask(task.id, { dueTime: e.target.value || null })}
-                    className="h-full cursor-pointer bg-transparent text-[13px] text-ink outline-none md:text-xs"
-                  />
-                </label>
-
-                <label className="flex h-11 items-center gap-1.5 rounded-lg border border-line px-3 text-[13px] text-ink-muted transition-colors hover:border-line-strong md:h-8 md:px-2.5 md:text-xs">
-                  <FolderOpen size={14} />
-                  <select
-                    value={task.projectId ?? ''}
-                    onChange={e => updateTask(task.id, { projectId: e.target.value || null, sectionId: null })}
-                    className="h-full cursor-pointer bg-transparent text-[13px] text-ink outline-none md:text-xs"
-                  >
-                    <option value="">Entrada</option>
-                    {projects.map(p => (
-                      <option key={p.id} value={p.id}>{p.name}</option>
-                    ))}
-                  </select>
-                </label>
-
-                {/* Seção — visível quando o projeto tem seções */}
-                {taskSections.length > 0 && (
-                  <label className="flex h-11 items-center gap-1.5 rounded-lg border border-line px-3 text-[13px] text-ink-muted transition-colors hover:border-line-strong md:h-8 md:px-2.5 md:text-xs">
-                    <Rows3 size={14} />
-                    <select
-                      value={task.sectionId ?? ''}
-                      onChange={e => updateTask(task.id, { sectionId: e.target.value || null })}
-                      className="h-full cursor-pointer bg-transparent text-[13px] text-ink outline-none md:text-xs"
-                    >
-                      <option value="">Sem seção</option>
-                      {taskSections.map(sec => (
-                        <option key={sec.id} value={sec.id}>{sec.name}</option>
-                      ))}
-                    </select>
-                  </label>
-                )}
-
-                <div className="flex h-11 items-center rounded-lg border border-line md:h-8 md:gap-0.5 md:px-1">
-                  {([1, 2, 3, 4] as Priority[]).map(p => (
-                    <button
-                      key={p}
-                      onClick={() => updateTask(task.id, { priority: p })}
-                      aria-label={`Prioridade ${p}`}
-                      className={cn(
-                        'flex size-11 cursor-pointer items-center justify-center rounded-md text-[13px] font-semibold transition-colors md:size-6 md:text-[11px]',
-                        task.priority === p ? 'bg-surface' : 'text-ink-faint hover:bg-surface',
-                      )}
-                      style={task.priority === p ? { color: PRIORITY_META[p].tint ?? 'var(--ink-muted)' } : undefined}
-                    >
-                      {PRIORITY_META[p].label}
-                    </button>
-                  ))}
-                </div>
-
-                <button
-                  onClick={() => setLabelsOpen(true)}
-                  className={cn(
-                    'flex h-11 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 text-[13px] text-ink-muted transition-colors hover:border-line-strong md:h-8 md:px-2.5 md:text-xs',
-                    taskLabels.length > 0 && 'text-ink',
-                  )}
-                >
-                  <Tag size={14} />
-                  {taskLabels.length > 0 ? `${taskLabels.length} etiqueta${taskLabels.length > 1 ? 's' : ''}` : 'Etiquetas'}
-                </button>
-
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => deleteTask(task.id)}
-                  className="ml-auto h-11 text-overdue hover:text-overdue hover:bg-overdue-bg md:h-8"
-                >
-                  <Trash2 size={14} />
-                  Excluir
-                </Button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <LabelPickerModal open={labelsOpen} onClose={() => setLabelsOpen(false)} taskId={task.id} />
 
       {/* Concluir a mãe com sub-tarefas pendentes */}
       <Modal
