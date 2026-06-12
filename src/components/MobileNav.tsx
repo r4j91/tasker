@@ -113,7 +113,7 @@ export function MobileNav() {
         whileTap={{ scale: 0.95 }}
         transition={{ type: 'spring', stiffness: 500, damping: 28 }}
         className={cn(
-          'absolute -top-7 right-1 z-10 flex size-14 items-center justify-center rounded-full',
+          'absolute -top-[60px] right-0 z-10 flex size-14 items-center justify-center rounded-full',
           'bg-primary-ink text-white dark:bg-primary dark:text-primary-fg',
           'shadow-[0_8px_24px_oklch(0.2_0.05_262/0.35),0_2px_8px_oklch(0.2_0.05_262/0.25)]',
         )}
